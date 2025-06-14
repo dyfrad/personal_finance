@@ -14,10 +14,6 @@ import sqlite3
 from tkinter import filedialog
 import csv
 
-# test squash 1
-# test squash 2
-# test squash 3
-
 def set_theme(root, light_mode=False):
     style = ttk.Style(root)
     style.theme_use('clam')
