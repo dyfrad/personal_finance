@@ -11,6 +11,8 @@ import yfinance as yf
 import ta
 import mplcursors
 import sqlite3
+from tkinter import filedialog
+import csv
 
 def set_theme(root, light_mode=False):
     style = ttk.Style(root)
@@ -1002,7 +1004,7 @@ class PersonalFinanceApp:
         scrollbar.grid(row=0, column=1, sticky=(tk.N, tk.S))
         button_frame = ttk.Frame(right_frame)
         button_frame.grid(row=1, column=0, columnspan=2, pady=10)
-        ttk.Button(button_frame, text="Save Portfolio", command=self.save_portfolio_gui).pack(side=tk.LEFT, padx=5)
+        ttk.Button(button_frame, text="Export Portfolio", command=self.export_portfolio_gui).pack(side=tk.LEFT, padx=5)
         ttk.Button(button_frame, text="Load Portfolio", command=self.load_portfolio_gui).pack(side=tk.LEFT, padx=5)
         ttk.Button(button_frame, text="Edit Selected", command=self.edit_selected).pack(side=tk.LEFT, padx=5)
         ttk.Button(button_frame, text="Delete Selected", command=self.delete_selected).pack(side=tk.LEFT, padx=5)
@@ -1171,11 +1173,6 @@ class PersonalFinanceApp:
         if hasattr(self, 'open_windows') and window_key in self.open_windows:
             self.open_windows[window_key].destroy()
             del self.open_windows[window_key]
-
-    def save_portfolio_gui(self):
-        from main import save_portfolio
-        save_portfolio(self.items)
-        CustomMessageBox(self.root, "Success", "Portfolio saved successfully!")
 
     def load_portfolio_gui(self):
         self.update_portfolio_display()
