@@ -1084,11 +1084,6 @@ class PersonalFinanceApp:
             self.db.add_mock_data(mock_items)
             self.load_portfolio_gui()
 
-    def save_portfolio_gui(self):
-        from main import save_portfolio
-        save_portfolio(self.items)
-        CustomMessageBox(self.root, "Success", "Portfolio saved successfully!")
-
     def export_portfolio_gui(self):
         # Get the file path from user
         file_path = filedialog.asksaveasfilename(
