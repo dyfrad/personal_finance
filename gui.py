@@ -214,11 +214,12 @@ class CustomMessageBox:
         parent.wait_window(self.top)
 
 class PerformanceGraphDialog:
-    def __init__(self, parent, item_data, db):
-        self.top = tk.Toplevel(parent)
+    def __init__(self, top_level_root, parent_for_modality, item_data, db):
+        self.top = top_level_root # Use the Toplevel provided by show_window
+        set_theme(self.top, light_mode=True) # Apply light theme
+        
         self.top.title(f"Performance Graph - {item_data.name}")
         self.top.geometry("1000x800")
-        set_theme(self.top, light_mode=True) # Apply light theme
         
         # Store database reference and item data
         self.db = db
@@ -226,7 +227,7 @@ class PerformanceGraphDialog:
         self.comparison_items = []
         
         # Make it modal
-        self.top.transient(parent)
+        self.top.transient(parent_for_modality) # parent_for_modality is PersonalFinanceApp's root
         self.top.grab_set()
         
         # Center the window
@@ -513,18 +514,29 @@ class TechnicalIndicators:
         return macd, signal_line, histogram
 
 class PurchasesDialog:
-    def __init__(self, parent, db, item_id, item_name):
-        set_theme(parent, light_mode=True)
+    def __init__(self, top_level_root, parent_for_modality, db, item_id, item_name):
         self.db = db
         self.item_id = item_id
-        self.top = tk.Toplevel(parent)
+        self.top = top_level_root # Use the Toplevel provided by show_window
         set_theme(self.top, light_mode=True) # Apply light theme
         self.top.title(f"Purchases for {item_name}")
         self.top.geometry("500x400")
         self.purchases = self.db.get_purchases_for_item(item_id)
 
+        # Make it modal
+        self.top.transient(parent_for_modality) # parent_for_modality is PersonalFinanceApp's root
+        self.top.grab_set()
+
+        # Center the window
+        self.top.update_idletasks()
+        width = self.top.winfo_width()
+        height = self.top.winfo_height()
+        x = (self.top.winfo_screenwidth() // 2) - (width // 2)
+        y = (self.top.winfo_screenheight() // 2) - (height // 2)
+        self.top.geometry(f'{width}x{height}+{x}+{y}')
+
         # Purchases list
-        self.tree = ttk.Treeview(self.top, columns=("Date", "Amount", "Price"), show='headings')
+        self.tree = ttk.Treeview(self.top, columns=("Date", "Amount", "Price"), show='headings') # master is self.top
         for col in ("Date", "Amount", "Price"):
             self.tree.heading(col, text=col)
             self.tree.column(col, width=120)
@@ -546,7 +558,6 @@ class PurchasesDialog:
         ttk.Button(add_frame, text="Add", command=self.add_purchase).grid(row=3, column=0, columnspan=2, pady=5)
 
         ttk.Button(self.top, text="Close", command=self.top.destroy).pack(pady=5)
-        parent.wait_window(self.top)
 
     def refresh_tree(self):
         for row in self.tree.get_children():
@@ -573,15 +584,27 @@ class PurchasesDialog:
         self.price_entry.delete(0, tk.END)
 
 class AddItemDialog:
-    def __init__(self, parent, db, on_success):
-        set_theme(parent, light_mode=True)
+    def __init__(self, top_level_root, parent_for_modality, db, on_success):
         self.db = db
         self.on_success = on_success
-        self.top = tk.Toplevel(parent)
+        self.top = top_level_root # Use the Toplevel provided by show_window
         set_theme(self.top, light_mode=True) # Apply light theme
         self.top.title("Add Item")
         self.top.geometry("400x350")
         self.top.resizable(False, False)
+        
+        # Make it modal
+        self.top.transient(parent_for_modality) # parent_for_modality is MainDashboard's root
+        self.top.grab_set()
+        
+        # Center the window
+        self.top.update_idletasks()
+        width = self.top.winfo_width()
+        height = self.top.winfo_height()
+        x = (self.top.winfo_screenwidth() // 2) - (width // 2)
+        y = (self.top.winfo_screenheight() // 2) - (height // 2)
+        self.top.geometry(f'{width}x{height}+{x}+{y}')
+
         # Fields
         ttk.Label(self.top, text="Name:").pack(pady=5)
         self.name_entry = ttk.Entry(self.top)
@@ -605,7 +628,7 @@ class AddItemDialog:
         self.price_entry.grid(row=2, column=1, padx=2)
         ttk.Button(self.top, text="Add Item", command=self.add_item).pack(pady=15)
         ttk.Button(self.top, text="Cancel", command=self.top.destroy).pack()
-        parent.wait_window(self.top)
+
     def add_item(self):
         name = self.name_entry.get().strip()
         category = self.category_var.get()
@@ -673,6 +696,8 @@ class MainDashboard:
         self.root.title("Personal Finance Manager")
         self.root.geometry("1200x800")
         self.root.resizable(True, True)
+        # Track open windows
+        self.open_windows = {}
         self.create_layout()
 
     def create_layout(self):
@@ -705,6 +730,43 @@ class MainDashboard:
         self.frame_bottomright = ttk.LabelFrame(self.root, text="More Features Coming Soon", padding=10)
         self.frame_bottomright.grid(row=1, column=1, sticky="nsew", padx=8, pady=8)
         ttk.Label(self.frame_bottomright, text="(Reserved for future features)").pack(expand=True)
+
+    def show_window(self, window_type, window_class, *args, **kwargs):
+        """Generic method to show or focus a window"""
+        print(f"show_window called for type: {window_type}")
+        print(f"Current open_windows: {self.open_windows.keys()}")
+
+        # Get the actual Toplevel window from the stored object if it exists
+        top_level_window = self.open_windows.get(window_type)
+        print(f"Retrieved top_level_window: {top_level_window}")
+
+        if top_level_window:
+            print(f"top_level_window exists in dict. Checking winfo_exists(): {top_level_window.winfo_exists()}")
+
+        if top_level_window and top_level_window.winfo_exists():
+            # Window exists, focus it
+            print(f"FOCUSED existing window: {window_type}")
+            top_level_window.lift()
+            top_level_window.focus_force()
+        else:
+            # Create new window
+            print(f"CREATING new window: {window_type}")
+            new_toplevel = tk.Toplevel(self.root)
+            # Pass the new Toplevel window as the first argument to the window_class
+            window_instance = window_class(new_toplevel, *args, **kwargs) # window_instance will be the dialog object
+
+            # Store the Toplevel window itself, not the dialog class instance
+            self.open_windows[window_type] = new_toplevel 
+            
+            # Set the protocol for closing the Toplevel window
+            new_toplevel.protocol("WM_DELETE_WINDOW", lambda: self.on_window_close(window_type))
+            print(f"New window created and stored: {new_toplevel}")
+
+    def on_window_close(self, window_type):
+        """Handle window close event"""
+        if window_type in self.open_windows:
+            self.open_windows[window_type].destroy()
+            del self.open_windows[window_type]
 
     def show_stock_controls(self, parent):
         # Dropdown for stock selection
@@ -867,12 +929,14 @@ class MainDashboard:
         ttk.Button(button_frame, text="Add Item", command=self.add_item_gui).pack(pady=10, padx=20, fill=tk.X)
 
     def open_portfolio_window(self):
-        top = tk.Toplevel(self.root)
-        app = PersonalFinanceApp(top)
+        """Open or focus the portfolio window"""
+        # Pass only the Toplevel to PersonalFinanceApp
+        self.show_window('portfolio', PersonalFinanceApp)
 
     def add_item_gui(self):
-        # Use the AddItemDialog for adding new items
-        AddItemDialog(self.root, self.db, self.refresh_dashboard)
+        """Open or focus the add item window"""
+        # Pass MainDashboard's root as the parent_for_modality
+        self.show_window('add_item', AddItemDialog, self.root, self.db, self.refresh_dashboard)
 
     def refresh_dashboard(self):
         # Redraw graphs and controls
@@ -890,9 +954,9 @@ class MainDashboard:
         self.show_expenses_graph(self.expenses_graph_frame)
 
 class PersonalFinanceApp:
-    def __init__(self, root):
-        set_theme(root, light_mode=True) # Apply theme to this window
-        self.root = root
+    def __init__(self, top_level_root):
+        set_theme(top_level_root, light_mode=True)
+        self.root = top_level_root # self.root is now the Toplevel provided by MainDashboard
         self.root.title("Portfolio")
         self.root.geometry("1000x600")
         self.db = Database()
@@ -908,6 +972,20 @@ class PersonalFinanceApp:
         self.create_right_panel(self.right_panel)
         # Load initial data
         self.load_portfolio_gui()
+        # Track open windows specific to PersonalFinanceApp (e.g., PerformanceGraphDialog, PurchasesDialog)
+        self.open_windows = {}
+
+    def show_window(self, window_type, window_class, *args, **kwargs):
+        """Generic method to show or focus a window, specific to PersonalFinanceApp"""
+        top_level_window = self.open_windows.get(window_type)
+        if top_level_window and top_level_window.winfo_exists():
+            top_level_window.lift()
+            top_level_window.focus_force()
+        else:
+            new_toplevel = tk.Toplevel(self.root)
+            window_instance = window_class(new_toplevel, *args, **kwargs)
+            self.open_windows[window_type] = new_toplevel
+            new_toplevel.protocol("WM_DELETE_WINDOW", lambda: self.on_window_close(window_type))
 
     def create_right_panel(self, parent):
         right_frame = ttk.LabelFrame(parent, text="Portfolio", padding="10")
@@ -1057,7 +1135,10 @@ class PersonalFinanceApp:
         # Retrieve the Item object from self.items using its ID
         item_to_show_performance = next((item for item in self.items if str(item.id) == selected_item_id), None)
         if item_to_show_performance and item_to_show_performance.category in ['Stocks', 'Bonds']:
-            PerformanceGraphDialog(self.root, item_to_show_performance, self.db)
+            # Create a unique key for this performance window
+            window_key = f'performance_{selected_item_id}'
+            # Use the new show_window method
+            self.show_window(window_key, PerformanceGraphDialog, self.root, item_to_show_performance, self.db)
         else:
             CustomMessageBox(self.root, "Info", "Performance graph is only available for Stocks and Bonds.", type="info")
 
@@ -1069,7 +1150,10 @@ class PersonalFinanceApp:
         # Retrieve the Item object from self.items using its ID
         item_to_view_purchases = next((item for item in self.items if str(item.id) == selected_item_id), None)
         if item_to_view_purchases and item_to_view_purchases.category in ['Stocks', 'Bonds']:
-            PurchasesDialog(self.root, self.db, item_to_view_purchases.id, item_to_view_purchases.name)
+            # Create a unique key for this purchases window
+            window_key = f'purchases_{selected_item_id}'
+            # Use the new show_window method
+            self.show_window(window_key, PurchasesDialog, self.root, self.db, item_to_view_purchases.id, item_to_view_purchases.name)
             self.load_portfolio_gui() # Refresh display after purchases are added/modified
         else:
             CustomMessageBox(self.root, "Info", "Purchase details are only available for Stocks and Bonds.", type="info")
@@ -1081,6 +1165,12 @@ class PersonalFinanceApp:
             from main import mock_items # Import mock_items from main
             self.db.add_mock_data(mock_items)
             self.load_portfolio_gui()
+
+    def on_window_close(self, window_key):
+        """Handle window close event"""
+        if hasattr(self, 'open_windows') and window_key in self.open_windows:
+            self.open_windows[window_key].destroy()
+            del self.open_windows[window_key]
 
     def save_portfolio_gui(self):
         from main import save_portfolio
