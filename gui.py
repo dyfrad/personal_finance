@@ -1,7 +1,6 @@
 import tkinter as tk
 from tkinter import ttk, messagebox
 from main import Item, save_portfolio, load_portfolio
-# , mock_items
 from database import Database
 import pandas as pd
 from datetime import datetime, timedelta

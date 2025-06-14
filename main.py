@@ -108,10 +108,4 @@ def load_portfolio():
                 item.add_purchase(Purchase(p_date, p_amount, p_price))
         items.append(item)
     return items
-
-# Initialize database with mock data if empty
-db = Database()
-# if not db.get_all_items(): # This now returns raw rows, which is fine
-#     db.add_mock_data(mock_items)
-
 # %%
