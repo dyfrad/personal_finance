@@ -1,6 +1,7 @@
 import tkinter as tk
 from tkinter import ttk, messagebox
-from main import Item, save_portfolio, load_portfolio, mock_items
+from main import Item, save_portfolio, load_portfolio
+# , mock_items
 from database import Database
 import pandas as pd
 from datetime import datetime, timedelta
@@ -1010,7 +1011,6 @@ class PersonalFinanceApp:
         ttk.Button(button_frame, text="Delete Selected", command=self.delete_selected).pack(side=tk.LEFT, padx=5)
         ttk.Button(button_frame, text="View Performance", command=self.show_performance).pack(side=tk.LEFT, padx=5)
         ttk.Button(button_frame, text="View/Add Purchases", command=self.view_purchases).pack(side=tk.LEFT, padx=5)
-        ttk.Button(button_frame, text="Reset Demo Data", command=self.reset_demo_data).pack(side=tk.LEFT, padx=5)
         self.total_value_label = ttk.Label(right_frame, text="Total Value: €0.00")
         self.total_value_label.grid(row=2, column=0, columnspan=2, pady=5)
 
@@ -1159,14 +1159,6 @@ class PersonalFinanceApp:
             self.load_portfolio_gui() # Refresh display after purchases are added/modified
         else:
             CustomMessageBox(self.root, "Info", "Purchase details are only available for Stocks and Bonds.", type="info")
-
-    def reset_demo_data(self):
-        if messagebox.askyesno("Reset Data", "Are you sure you want to reset all data to demo data?"):
-            self.db.clear_all_items()
-            self.db.clear_all_purchases()
-            from main import mock_items # Import mock_items from main
-            self.db.add_mock_data(mock_items)
-            self.load_portfolio_gui()
 
     def on_window_close(self, window_key):
         """Handle window close event"""

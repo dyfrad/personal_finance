@@ -109,28 +109,9 @@ def load_portfolio():
         items.append(item)
     return items
 
-# Add mock household data for a 29-year-old single person in the Netherlands
-mock_items = []
-# VUSA.AS stock (multiple purchases)
-vusa = Item('VUSA.AS', 'Stocks')
-start_date = datetime.now() - timedelta(days=730)
-for i in range(24):
-    date = (start_date + timedelta(days=30*i)).replace(day=1).strftime('%Y-%m-%d')
-    price = 80 + i * 0.8  # Simulated price
-    vusa.add_purchase(Purchase(date, 500 / price, price)) # Amount of shares = value / price
-mock_items.append(vusa)
-# Household Items
-mock_items.append(Item("Laptop (Dell XPS 15)", "Electronics", 1500.00, "2023-03-20", 1100.00, -400.00))
-mock_items.append(Item("Smart TV (LG OLED)", "Electronics", 1200.00, "2022-11-10", 950.00, -250.00))
-mock_items.append(Item("Road Bicycle (Giant)", "Transportation", 800.00, "2023-05-15", 700.00, -100.00))
-mock_items.append(Item("Gaming Console (PS5)", "Electronics", 500.00, "2023-12-01", 450.00, -50.00))
-mock_items.append(Item("Espresso Machine (De'Longhi)", "Appliances", 350.00, "2024-01-25", 300.00, -50.00))
-mock_items.append(Item("Bed (IKEA Malm)", "Furniture", 400.00, "2022-09-01", 320.00, -80.00))
-mock_items.append(Item("Savings Account (Bunq)", "Savings", 5000.00, "2023-01-01", 5150.00, 150.00))
-
 # Initialize database with mock data if empty
 db = Database()
-if not db.get_all_items(): # This now returns raw rows, which is fine
-    db.add_mock_data(mock_items)
+# if not db.get_all_items(): # This now returns raw rows, which is fine
+#     db.add_mock_data(mock_items)
 
 # %%
