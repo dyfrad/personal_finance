@@ -1174,6 +1174,30 @@ class PersonalFinanceApp:
             self.open_windows[window_key].destroy()
             del self.open_windows[window_key]
 
+    def export_portfolio_gui(self):
+        # Get the file path from user
+        file_path = filedialog.asksaveasfilename(
+            defaultextension=".csv",
+            filetypes=[("CSV files", "*.csv"), ("All files", "*.*")],
+            title="Export Portfolio"
+        )
+        
+        if file_path:  # If user didn't cancel
+            try:
+                with open(file_path, 'w', newline='') as csvfile:
+                    writer = csv.writer(csvfile)
+                    # Write header
+                    writer.writerow(['ID', 'Name', 'Purchase Price', 'Date', 'Current Value', 'Profit/Loss', 'Category'])
+                    
+                    # Write data
+                    for item_id in self.tree.get_children():
+                        values = self.tree.item(item_id)['values']
+                        writer.writerow(values)
+                        
+                CustomMessageBox(self.root, "Success", "Portfolio exported successfully!")
+            except Exception as e:
+                CustomMessageBox(self.root, "Error", f"Error exporting portfolio: {str(e)}", type="error")                 
+
     def load_portfolio_gui(self):
         self.update_portfolio_display()
 
