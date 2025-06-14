@@ -612,6 +612,30 @@ class AddItemDialog:
         if not name:
             messagebox.showerror("Error", "Name is required.")
             return
+
+        # Get purchase details
+        date = self.date_entry.get().strip()
+        amount = self.amount_entry.get().strip()
+        price = self.price_entry.get().strip()
+
+        # Initialize values
+        purchase_price = 0
+        current_value = 0
+        date_of_purchase = datetime.now().isoformat()
+        profit_loss = 0
+
+        # For non-stock items, use the entered values if provided
+        if category not in ['Stocks', 'Bonds']:
+            if date and amount and price:  # Only use values if all fields are provided
+                try:
+                    purchase_price = float(price)
+                    current_value = float(price)  # Initially set current value same as purchase price
+                    date_of_purchase = date
+                    profit_loss = current_value - purchase_price
+                except ValueError:
+                    messagebox.showerror("Error", "Amount and Price must be numbers.")
+                    return
+
         # Insert item
         now = datetime.now().isoformat()
         conn = sqlite3.connect(self.db.db_name)
@@ -619,24 +643,23 @@ class AddItemDialog:
         cursor.execute('''
         INSERT INTO items (name, purchase_price, date_of_purchase, current_value, profit_loss, category, created_at, updated_at)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-        ''', (name, 0, now, 0, 0, category, now, now))
+        ''', (name, purchase_price, date_of_purchase, current_value, profit_loss, category, now, now))
         item_id = cursor.lastrowid
-        # Optional purchase
-        date = self.date_entry.get().strip()
-        amount = self.amount_entry.get().strip()
-        price = self.price_entry.get().strip()
-        if date and amount and price:
+
+        # For stocks/bonds, add the purchase if provided
+        if category in ['Stocks', 'Bonds'] and date and amount and price:
             try:
                 amount = float(amount)
                 price = float(price)
                 cursor.execute('''
                 INSERT INTO purchases (item_id, date, amount, price) VALUES (?, ?, ?, ?)
                 ''', (item_id, date, amount, price))
-            except Exception:
+            except ValueError:
                 messagebox.showerror("Error", "Amount and Price must be numbers.")
                 conn.commit()
                 conn.close()
                 return
+
         conn.commit()
         conn.close()
         self.top.destroy()
