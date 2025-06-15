@@ -1,128 +1,101 @@
 # Personal Finance Manager
 
-A Python-based personal finance management application that helps you track your assets, investments, and household items. The application provides both a command-line interface and a graphical user interface (GUI) for managing your financial portfolio.
+A Python-based personal finance management application that helps you track and manage your financial portfolio, including stocks, bonds, and other assets.
 
 ## Features
 
-- Track various types of assets:
-  - Household items
-  - Investments (stocks, bonds)
-  - Personal assets
-  - Savings accounts
+- Track stocks and bonds with multiple purchases
+- Monitor regular items (appliances, electronics, etc.)
 - Calculate profit/loss for each item
-- View total portfolio value
-- Save and load portfolio data
-- Modern GUI interface with:
-  - Easy item addition
-  - Tabular view of all items
-  - Delete functionality
-  - Automatic calculations
-  - Data persistence
-- SQLite database for reliable data storage:
-  - Automatic data persistence
-  - Transaction support
-  - Data integrity with timestamps
-  - Efficient querying
-
-## Requirements
-
-- Python 3.x
-- Required Python packages:
-  - tkinter (usually comes with Python)
-  - pandas
-  - numpy
-  - sqlite3 (comes with Python)
+- View performance graphs and technical analysis
+- Export/import portfolio data
+- Modern, user-friendly GUI
+- Dark/light theme support
 
 ## Installation
 
 1. Clone the repository:
 ```bash
-git clone <repository-url>
+git clone https://github.com/yourusername/personal_finance.git
 cd personal_finance
 ```
 
-2. Install required packages:
+2. Create and activate a virtual environment:
 ```bash
-pip install -r requirements.txt
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+```
+
+3. Install the package:
+```bash
+pip install -e .
 ```
 
 ## Usage
 
-### GUI Version
-
-To run the graphical user interface:
-
+Run the application:
 ```bash
-python gui.py
+personal_finance
 ```
 
-The GUI provides the following features:
-- Add new items with details like name, purchase price, date, current value, and category
-- View all items in a sortable table
-- Save and load your portfolio
-- Delete items
-- See total portfolio value
-- Automatic data persistence using SQLite
-
-### Command Line Version
-
-To run the command-line interface:
-
+Or run directly:
 ```bash
 python main.py
 ```
 
-The CLI provides the following options:
-1. Add Item
-2. Display Portfolio
-3. Save Portfolio
-4. Load Portfolio
-5. Exit
+## Development
 
-## Data Storage
-
-The application uses SQLite database (`finance.db`) for data storage, which includes:
-- Item name
-- Purchase price
-- Date of purchase
-- Current value
-- Profit/Loss
-- Category
-- Creation timestamp
-- Last update timestamp
-
-The database provides:
-- Automatic data persistence
-- Transaction support
-- Data integrity
-- Efficient querying
-- Backup and restore capabilities
-
-## Example Categories
-
-The application supports various categories of items:
-- Appliances
-- Electronics
-- Furniture
-- Stocks
-- Bonds
-- Transportation
-- Home Improvement
-- Savings
-- Collectibles
-
-## Project Structure
+### Project Structure
 
 ```
 personal_finance/
-├── main.py           # Core functionality and CLI
-├── gui.py           # Graphical user interface
-├── database.py      # SQLite database operations
-├── finance.db       # SQLite database file (created automatically)
-├── requirements.txt # Python package dependencies
-└── README.md        # This file
+├── models/             # Data models
+├── services/          # Business logic
+├── ui/               # GUI components
+├── utils/            # Utility functions
+├── config/           # Configuration
+├── tests/            # Test files
+├── main.py           # Application entry point
+├── setup.py          # Package setup
+└── requirements.txt  # Dependencies
+```
+
+### Running Tests
+
+```bash
+pytest
+```
+
+For coverage report:
+```bash
+pytest --cov=.
+```
+
+### Code Style
+
+The project uses:
+- Black for code formatting
+- Flake8 for linting
+- MyPy for type checking
+
+Run all checks:
+```bash
+black .
+flake8
+mypy .
 ```
 
 ## Contributing
 
-Feel free to submit issues and enhancement requests!
+1. Fork the repository
+2. Create a feature branch
+3. Commit your changes
+4. Push to the branch
+5. Create a Pull Request
+
+## Acknowledgments
+
+- [yfinance](https://github.com/ranaroussi/yfinance) for stock data
+- [ta](https://github.com/bukosabino/ta) for technical analysis
+- [matplotlib](https://matplotlib.org/) for plotting
+- [tkinter](https://docs.python.org/3/library/tkinter.html) for GUI
