@@ -15,6 +15,15 @@ from tkinter import filedialog
 import csv
 
 def set_theme(root, light_mode=False):
+    """Configure the application's visual theme.
+    
+    Sets up the ttk styles and colors for the application based on the selected theme.
+    Implements a Google Material Design-inspired theme with both light and dark variants.
+    
+    Args:
+        root (tk.Tk): The root window to apply the theme to
+        light_mode (bool): If True, applies light theme; if False, applies dark theme
+    """
     style = ttk.Style(root)
     style.theme_use('clam')
 
@@ -87,6 +96,18 @@ def set_theme(root, light_mode=False):
         style.configure("Warning.Custom.TLabel", foreground="#FFD740", background=dark_bg) # Amber A200
 
 class EditDialog:
+    """Dialog window for editing item details.
+    
+    Provides a modal dialog window with fields to edit an item's properties.
+    Handles both regular items and financial instruments (stocks/bonds) differently.
+    
+    Attributes:
+        top (tk.Toplevel): The dialog window
+        item (Item): The item being edited
+        entries (dict): Dictionary of entry widgets for item properties
+        category_var (tk.StringVar): Variable holding the selected category
+        result (Item): The updated item after editing
+    """
     def __init__(self, parent, item):
         self.top = tk.Toplevel(parent)
         self.top.title(f"Edit Item: {item.name}")
@@ -179,6 +200,14 @@ class EditDialog:
         self.top.destroy()
 
 class CustomMessageBox:
+    """Custom message box dialog with themed styling.
+    
+    Provides a modal dialog window for displaying messages with different styles
+    (info, warning, error) and consistent theming.
+    
+    Attributes:
+        top (tk.Toplevel): The dialog window
+    """
     def __init__(self, parent, title, message, type="info"):
         self.top = tk.Toplevel(parent)
         self.top.title(title)
@@ -216,6 +245,17 @@ class CustomMessageBox:
         parent.wait_window(self.top)
 
 class PerformanceGraphDialog:
+    """Dialog window for displaying performance graphs and technical analysis.
+    
+    Provides an interactive graph window for analyzing item performance with
+    technical indicators and comparison capabilities.
+    
+    Attributes:
+        top (tk.Toplevel): The dialog window
+        db (Database): Database connection for data retrieval
+        item_data (Item): The item being analyzed
+        comparison_items (list): List of items selected for comparison
+    """
     def __init__(self, top_level_root, parent_for_modality, item_data, db):
         self.top = top_level_root # Use the Toplevel provided by show_window
         set_theme(self.top, light_mode=True) # Apply light theme
@@ -262,6 +302,11 @@ class PerformanceGraphDialog:
         self.update_graph()
         
     def create_control_panel(self, parent):
+        """Create the control panel for the performance graph.
+        
+        Args:
+            parent (ttk.Frame): Parent frame for the control panel
+        """
         control_frame = ttk.LabelFrame(parent, text="Controls", padding="5")
         control_frame.pack(fill=tk.X, pady=5)
         
@@ -300,6 +345,7 @@ class PerformanceGraphDialog:
                                              command=lambda v=item_data: self.comparison_var.set(v))
         
     def update_comparison_menu(self):
+        """Update the comparison menu with available stocks and bonds."""
         # Get all stocks and bonds from database
         rows = self.db.get_all_items()
         # Convert raw rows to Item objects for consistency
@@ -320,10 +366,19 @@ class PerformanceGraphDialog:
         return ["None"] + [f"{item.name} ({item.category})" for item in self.comparison_items]
         
     def add_comparison(self, _):
+        """Add a selected item to the comparison list."""
         self.update_graph()
         
     def get_historical_data(self, item_data, period):
-        """Fetches historical data for a given Item object (stock or bond)."""
+        """Retrieve historical data for an item.
+        
+        Args:
+            item_data (Item): The item to get data for
+            period (str): Time period for historical data
+            
+        Returns:
+            pd.DataFrame: Historical price data
+        """
         try:
             if item_data.category == 'Stocks':
                 ticker_symbol = item_data.name.split()[0] if ' ' in item_data.name else item_data.name
@@ -363,6 +418,14 @@ class PerformanceGraphDialog:
             return pd.DataFrame({'Close': values}, index=dates)
             
     def calculate_indicators(self, data):
+        """Calculate technical indicators for the data.
+        
+        Args:
+            data (pd.DataFrame): Price data
+            
+        Returns:
+            dict: Dictionary of calculated indicators
+        """
         indicators = {}
         
         if self.indicator_vars["SMA"].get():
@@ -383,6 +446,7 @@ class PerformanceGraphDialog:
         return indicators
         
     def update_graph(self):
+        """Update the performance graph with current data and settings."""
         try:
             # Clear previous plots
             self.ax1.clear()
@@ -486,19 +550,49 @@ class PerformanceGraphDialog:
             messagebox.showerror("Error", f"Error updating graph: {str(e)}")
 
 class TechnicalIndicators:
+    """Collection of technical analysis indicators for financial data.
+    
+    Provides static methods for calculating various technical indicators
+    commonly used in financial analysis.
+    """
+    
     @staticmethod
     def sma(data, window=20):
-        """Calculate Simple Moving Average"""
+        """Calculate Simple Moving Average.
+        
+        Args:
+            data (pd.Series): Price data series
+            window (int): Window size for the moving average
+            
+        Returns:
+            pd.Series: Simple moving average values
+        """
         return data.rolling(window=window).mean()
     
     @staticmethod
     def ema(data, window=20):
-        """Calculate Exponential Moving Average"""
+        """Calculate Exponential Moving Average.
+        
+        Args:
+            data (pd.Series): Price data series
+            window (int): Window size for the moving average
+            
+        Returns:
+            pd.Series: Exponential moving average values
+        """
         return data.ewm(span=window, adjust=False).mean()
     
     @staticmethod
     def rsi(data, window=14):
-        """Calculate Relative Strength Index"""
+        """Calculate Relative Strength Index.
+        
+        Args:
+            data (pd.Series): Price data series
+            window (int): Window size for RSI calculation
+            
+        Returns:
+            pd.Series: RSI values
+        """
         delta = data.diff()
         gain = (delta.where(delta > 0, 0)).rolling(window=window).mean()
         loss = (-delta.where(delta < 0, 0)).rolling(window=window).mean()
@@ -507,7 +601,17 @@ class TechnicalIndicators:
     
     @staticmethod
     def macd(data, fast=12, slow=26, signal=9):
-        """Calculate MACD, Signal, and Histogram"""
+        """Calculate Moving Average Convergence Divergence.
+        
+        Args:
+            data (pd.Series): Price data series
+            fast (int): Fast period
+            slow (int): Slow period
+            signal (int): Signal period
+            
+        Returns:
+            tuple: (MACD line, Signal line, Histogram)
+        """
         exp1 = data.ewm(span=fast, adjust=False).mean()
         exp2 = data.ewm(span=slow, adjust=False).mean()
         macd = exp1 - exp2
@@ -516,6 +620,18 @@ class TechnicalIndicators:
         return macd, signal_line, histogram
 
 class PurchasesDialog:
+    """Dialog window for managing item purchases.
+    
+    Provides a modal dialog window for viewing, adding, and managing
+    purchase records for stocks and bonds.
+    
+    Attributes:
+        top (tk.Toplevel): The dialog window
+        db (Database): Database connection for data operations
+        item_id (int): ID of the item being managed
+        item_name (str): Name of the item being managed
+        tree (ttk.Treeview): Treeview widget displaying purchases
+    """
     def __init__(self, top_level_root, parent_for_modality, db, item_id, item_name):
         self.db = db
         self.item_id = item_id
@@ -562,12 +678,14 @@ class PurchasesDialog:
         ttk.Button(self.top, text="Close", command=self.top.destroy).pack(pady=5)
 
     def refresh_tree(self):
+        """Refresh the purchases treeview with current data."""
         for row in self.tree.get_children():
             self.tree.delete(row)
         for purchase in self.purchases:
             self.tree.insert('', tk.END, values=purchase)
 
     def add_purchase(self):
+        """Add a new purchase record for the item."""
         date = self.date_entry.get()
         try:
             amount = float(self.amount_entry.get())
@@ -586,6 +704,18 @@ class PurchasesDialog:
         self.price_entry.delete(0, tk.END)
 
 class AddItemDialog:
+    """Dialog window for adding new items to the portfolio.
+    
+    Provides a modal dialog window with fields to input details for a new item.
+    Handles both regular items and financial instruments (stocks/bonds).
+    
+    Attributes:
+        top (tk.Toplevel): The dialog window
+        db (Database): Database connection for data operations
+        on_success (callable): Callback function to execute after successful addition
+        entries (dict): Dictionary of entry widgets for item properties
+        category_var (tk.StringVar): Variable holding the selected category
+    """
     def __init__(self, top_level_root, parent_for_modality, db, on_success):
         self.db = db
         self.on_success = on_success
@@ -632,6 +762,7 @@ class AddItemDialog:
         ttk.Button(self.top, text="Cancel", command=self.top.destroy).pack()
 
     def add_item(self):
+        """Add a new item to the portfolio."""
         name = self.name_entry.get().strip()
         category = self.category_var.get()
         if not name:
@@ -691,6 +822,18 @@ class AddItemDialog:
         self.on_success()
 
 class MainDashboard:
+    """Main dashboard window of the application.
+    
+    Provides the primary interface for viewing financial data, including
+    stock performance, expenses, and portfolio overview.
+    
+    Attributes:
+        root (tk.Tk): The root window
+        db (Database): Database connection for data operations
+        windows (dict): Dictionary of active window instances
+        stock_frame (ttk.Frame): Frame containing stock-related controls
+        expenses_frame (ttk.Frame): Frame containing expenses-related controls
+    """
     def __init__(self, root, db):
         set_theme(root, light_mode=True)
         self.root = root
@@ -703,6 +846,7 @@ class MainDashboard:
         self.create_layout()
 
     def create_layout(self):
+        """Create the main dashboard layout."""
         for i in range(2):
             self.root.rowconfigure(i, weight=1)
             self.root.columnconfigure(i, weight=1)
@@ -734,7 +878,14 @@ class MainDashboard:
         ttk.Label(self.frame_bottomright, text="(Reserved for future features)").pack(expand=True)
 
     def show_window(self, window_type, window_class, *args, **kwargs):
-        """Generic method to show or focus a window"""
+        """Show a new window of the specified type.
+        
+        Args:
+            window_type (str): Type of window to show
+            window_class (class): Class of the window to instantiate
+            *args: Additional positional arguments for window initialization
+            **kwargs: Additional keyword arguments for window initialization
+        """
         print(f"show_window called for type: {window_type}")
         print(f"Current open_windows: {self.open_windows.keys()}")
 
@@ -765,12 +916,21 @@ class MainDashboard:
             print(f"New window created and stored: {new_toplevel}")
 
     def on_window_close(self, window_type):
-        """Handle window close event"""
+        """Handle window close event.
+        
+        Args:
+            window_type (str): Type of window being closed
+        """
         if window_type in self.open_windows:
             self.open_windows[window_type].destroy()
             del self.open_windows[window_type]
 
     def show_stock_controls(self, parent):
+        """Create stock control widgets.
+        
+        Args:
+            parent (ttk.Frame): Parent frame for the controls
+        """
         # Dropdown for stock selection
         rows = self.db.get_all_items()
         stock_names = [row[1] for row in rows if row[6] == 'Stocks']
@@ -789,11 +949,17 @@ class MainDashboard:
             ttk.Checkbutton(parent, text=name, variable=self.indicators[name], command=self.update_stock_graph).pack(side=tk.LEFT, padx=2)
 
     def update_stock_graph(self):
+        """Update the stock performance graph."""
         for widget in self.stock_graph_frame.winfo_children():
             widget.destroy()
         self.show_stock_performance_graph(self.stock_graph_frame)
 
     def show_stock_performance_graph(self, parent):
+        """Show the stock performance graph.
+        
+        Args:
+            parent (ttk.Frame): Parent frame for the graph
+        """
         rows = self.db.get_all_items()
         stock_item = next((item for item in self.get_loaded_items() if item.name == self.selected_stock.get()), None)
         if not stock_item:
@@ -835,12 +1001,24 @@ class MainDashboard:
         mplcursors.cursor(ax.collections, hover=True)
 
     def get_loaded_items(self):
-        """Helper to get all loaded items from the database as Item objects."""
+        """Get all items from the database.
+        
+        Returns:
+            list: List of Item objects
+        """
         from main import load_portfolio
         return load_portfolio()
 
     def get_historical_data_for_stock(self, item_data, period):
-        """Fetches historical data for a given stock Item object."""
+        """Get historical data for a stock.
+        
+        Args:
+            item_data (Item): The stock item
+            period (str): Time period for historical data
+            
+        Returns:
+            pd.DataFrame: Historical price data
+        """
         try:
             ticker_symbol = item_data.name.split()[0] if ' ' in item_data.name else item_data.name
             if ticker_symbol == 'VUSA':
@@ -872,6 +1050,14 @@ class MainDashboard:
             return pd.DataFrame({'Close': values}, index=dates)
 
     def calculate_indicators(self, data):
+        """Calculate technical indicators for stock data.
+        
+        Args:
+            data (pd.DataFrame): Stock price data
+            
+        Returns:
+            dict: Dictionary of calculated indicators
+        """
         indicators = {}
         if self.indicators["SMA"].get():
             indicators['SMA'] = TechnicalIndicators.sma(data['Close'])
@@ -885,6 +1071,11 @@ class MainDashboard:
         return indicators
 
     def show_expenses_controls(self, parent):
+        """Create expenses control widgets.
+        
+        Args:
+            parent (ttk.Frame): Parent frame for the controls
+        """
         # Date range selector
         self.expenses_period = tk.StringVar(value="1mo")
         ttk.Label(parent, text="Period:").pack(side=tk.LEFT, padx=5)
@@ -895,11 +1086,17 @@ class MainDashboard:
         # ttk.OptionMenu(parent, tk.StringVar(), "All").pack(side=tk.LEFT, padx=5)
 
     def update_expenses_graph(self):
+        """Update the expenses graph."""
         for widget in self.expenses_graph_frame.winfo_children():
             widget.destroy()
         self.show_expenses_graph(self.expenses_graph_frame)
 
     def show_expenses_graph(self, parent):
+        """Show the expenses graph.
+        
+        Args:
+            parent (ttk.Frame): Parent frame for the graph
+        """
         import numpy as np
         import pandas as pd
         from datetime import datetime, timedelta
@@ -925,22 +1122,28 @@ class MainDashboard:
         canvas.get_tk_widget().pack(fill=tk.BOTH, expand=True)
 
     def show_topright_buttons(self, parent):
+        """Create top-right control buttons.
+        
+        Args:
+            parent (ttk.Frame): Parent frame for the buttons
+        """
         button_frame = ttk.Frame(parent)
         button_frame.pack(expand=True, fill=tk.BOTH, pady=20)
         ttk.Button(button_frame, text="View Items", command=self.open_portfolio_window).pack(pady=10, padx=20, fill=tk.X)
         ttk.Button(button_frame, text="Add Item", command=self.add_item_gui).pack(pady=10, padx=20, fill=tk.X)
 
     def open_portfolio_window(self):
-        """Open or focus the portfolio window"""
+        """Open the portfolio management window."""
         # Pass only the Toplevel to PersonalFinanceApp
         self.show_window('portfolio', PersonalFinanceApp)
 
     def add_item_gui(self):
-        """Open or focus the add item window"""
+        """Open the add item dialog."""
         # Pass MainDashboard's root as the parent_for_modality
         self.show_window('add_item', AddItemDialog, self.root, self.db, self.refresh_dashboard)
 
     def refresh_dashboard(self):
+        """Refresh all dashboard components."""
         # Redraw graphs and controls
         for widget in self.stock_graph_frame.winfo_children():
             widget.destroy()
@@ -956,6 +1159,18 @@ class MainDashboard:
         self.show_expenses_graph(self.expenses_graph_frame)
 
 class PersonalFinanceApp:
+    """Main application class for the personal finance manager.
+    
+    Manages the main application window and coordinates between different
+    components of the application.
+    
+    Attributes:
+        root (tk.Tk): The root window
+        db (Database): Database connection for data operations
+        windows (dict): Dictionary of active window instances
+        portfolio_tree (ttk.Treeview): Treeview widget displaying portfolio items
+        right_panel (ttk.Frame): Frame containing right panel controls
+    """
     def __init__(self, top_level_root):
         set_theme(top_level_root, light_mode=True)
         self.root = top_level_root # self.root is now the Toplevel provided by MainDashboard
@@ -978,7 +1193,14 @@ class PersonalFinanceApp:
         self.open_windows = {}
 
     def show_window(self, window_type, window_class, *args, **kwargs):
-        """Generic method to show or focus a window, specific to PersonalFinanceApp"""
+        """Show a new window of the specified type.
+        
+        Args:
+            window_type (str): Type of window to show
+            window_class (class): Class of the window to instantiate
+            *args: Additional positional arguments for window initialization
+            **kwargs: Additional keyword arguments for window initialization
+        """
         top_level_window = self.open_windows.get(window_type)
         if top_level_window and top_level_window.winfo_exists():
             top_level_window.lift()
@@ -990,6 +1212,11 @@ class PersonalFinanceApp:
             new_toplevel.protocol("WM_DELETE_WINDOW", lambda: self.on_window_close(window_type))
 
     def create_right_panel(self, parent):
+        """Create the right panel with action buttons.
+        
+        Args:
+            parent (ttk.Frame): Parent frame for the panel
+        """
         right_frame = ttk.LabelFrame(parent, text="Portfolio", padding="10")
         right_frame.pack(fill=tk.BOTH, expand=True)
         columns = ('ID', 'Name', 'Purchase Price', 'Date', 'Current Value', 'Profit/Loss', 'Category')
@@ -1014,6 +1241,7 @@ class PersonalFinanceApp:
         self.total_value_label.grid(row=2, column=0, columnspan=2, pady=5)
 
     def update_portfolio_display(self):
+        """Update the portfolio treeview with current data."""
         # Clear existing items
         for item_in_tree in self.tree.get_children():
             self.tree.delete(item_in_tree)
@@ -1093,6 +1321,7 @@ class PersonalFinanceApp:
         self.total_value_label.config(text=f"Total Value: €{total_portfolio_value:.2f}")
 
     def edit_selected(self):
+        """Edit the selected portfolio item."""
         selected_item_id = self.tree.focus()
         if not selected_item_id:
             CustomMessageBox(self.root, "Error", "Please select an item to edit.", type="error")
@@ -1119,6 +1348,7 @@ class PersonalFinanceApp:
                 self.load_portfolio_gui() # Refresh the display
 
     def delete_selected(self):
+        """Delete the selected portfolio item."""
         selected_item_id = self.tree.focus()
         if not selected_item_id:
             CustomMessageBox(self.root, "Error", "Please select an item to delete.", type="error")
@@ -1129,6 +1359,7 @@ class PersonalFinanceApp:
             self.load_portfolio_gui() # Refresh the display
 
     def show_performance(self):
+        """Show performance analysis for selected item."""
         selected_item_id = self.tree.focus()
         if not selected_item_id:
             CustomMessageBox(self.root, "Error", "Please select an item to view performance.", type="error")
@@ -1144,6 +1375,7 @@ class PersonalFinanceApp:
             CustomMessageBox(self.root, "Info", "Performance graph is only available for Stocks and Bonds.", type="info")
 
     def view_purchases(self):
+        """View purchases for selected item."""
         selected_item_id = self.tree.focus()
         if not selected_item_id:
             CustomMessageBox(self.root, "Error", "Please select an item to view purchases.", type="error")
@@ -1160,12 +1392,17 @@ class PersonalFinanceApp:
             CustomMessageBox(self.root, "Info", "Purchase details are only available for Stocks and Bonds.", type="info")
 
     def on_window_close(self, window_key):
-        """Handle window close event"""
+        """Handle window close event.
+        
+        Args:
+            window_key (str): Key of the window being closed
+        """
         if hasattr(self, 'open_windows') and window_key in self.open_windows:
             self.open_windows[window_key].destroy()
             del self.open_windows[window_key]
 
     def export_portfolio_gui(self):
+        """Export portfolio data to a CSV file."""
         # Get the file path from user
         file_path = filedialog.asksaveasfilename(
             defaultextension=".csv",
@@ -1190,6 +1427,7 @@ class PersonalFinanceApp:
                 CustomMessageBox(self.root, "Error", f"Error exporting portfolio: {str(e)}", type="error")                 
 
     def load_portfolio_gui(self):
+        """Load portfolio data from a CSV file."""
         self.update_portfolio_display()
 
 if __name__ == "__main__":
