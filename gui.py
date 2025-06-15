@@ -704,62 +704,60 @@ class PurchasesDialog:
         self.price_entry.delete(0, tk.END)
 
 class AddItemDialog:
-    """Dialog window for adding new items to the portfolio.
+    """Dialog for adding new items to the portfolio."""
     
-    Provides a modal dialog window with fields to input details for a new item.
-    Handles both regular items and financial instruments (stocks/bonds).
-    
-    Attributes:
-        top (tk.Toplevel): The dialog window
-        db (Database): Database connection for data operations
-        on_success (callable): Callback function to execute after successful addition
-        entries (dict): Dictionary of entry widgets for item properties
-        category_var (tk.StringVar): Variable holding the selected category
-    """
-    def __init__(self, top_level_root, parent_for_modality, db, on_success):
+    def __init__(self, top_level_root, parent_for_modality, db, on_success, category=None):
         self.db = db
         self.on_success = on_success
-        self.top = top_level_root # Use the Toplevel provided by show_window
-        set_theme(self.top, light_mode=True) # Apply light theme
-        self.top.title("Add Item")
-        self.top.geometry("400x350")
-        self.top.resizable(False, False)
+        self.category = category
         
-        # Make it modal
-        self.top.transient(parent_for_modality) # parent_for_modality is MainDashboard's root
+        self.top = tk.Toplevel(top_level_root)
+        self.top.title("Add New Item")
+        self.top.geometry("400x500")
+        self.top.transient(parent_for_modality)
         self.top.grab_set()
         
-        # Center the window
-        self.top.update_idletasks()
-        width = self.top.winfo_width()
-        height = self.top.winfo_height()
-        x = (self.top.winfo_screenwidth() // 2) - (width // 2)
-        y = (self.top.winfo_screenheight() // 2) - (height // 2)
-        self.top.geometry(f'{width}x{height}+{x}+{y}')
-
-        # Fields
+        # Create form
         ttk.Label(self.top, text="Name:").pack(pady=5)
         self.name_entry = ttk.Entry(self.top)
         self.name_entry.pack(pady=5, fill=tk.X, padx=20)
+        
         ttk.Label(self.top, text="Category:").pack(pady=5)
-        self.category_var = tk.StringVar(value="Stocks")
-        categories = ["Stocks", "Bonds", "Appliances", "Electronics", "Furniture", "Transportation", "Home Improvement", "Savings", "Collectibles"]
+        self.category_var = tk.StringVar()
+        
+        # Set categories based on item type
+        if category == "Investment":
+            categories = ["Stocks", "Bonds", "Crypto", "Real Estate", "Gold"]
+        elif category == "Inventory":
+            categories = ["Appliances", "Electronics", "Furniture", "Transportation", "Home Improvement", "Savings", "Collectibles"]
+        elif category == "Expense":
+            categories = ["Expense"]
+        else:
+            categories = ["Stocks", "Bonds", "Crypto", "Real Estate", "Gold",
+                         "Appliances", "Electronics", "Furniture", "Transportation",
+                         "Home Improvement", "Savings", "Collectibles", "Expense"]
+        
+        self.category_var.set(categories[0])
         ttk.OptionMenu(self.top, self.category_var, self.category_var.get(), *categories).pack(pady=5, fill=tk.X, padx=20)
-        # Optional initial purchase
-        ttk.Label(self.top, text="Initial Purchase (optional)").pack(pady=10)
-        frame = ttk.Frame(self.top)
-        frame.pack(pady=2, fill=tk.X, padx=20)
-        ttk.Label(frame, text="Date (YYYY-MM-DD)").grid(row=0, column=0, padx=2)
-        self.date_entry = ttk.Entry(frame)
-        self.date_entry.grid(row=0, column=1, padx=2)
-        ttk.Label(frame, text="Amount").grid(row=1, column=0, padx=2)
-        self.amount_entry = ttk.Entry(frame)
-        self.amount_entry.grid(row=1, column=1, padx=2)
-        ttk.Label(frame, text="Price").grid(row=2, column=0, padx=2)
-        self.price_entry = ttk.Entry(frame)
-        self.price_entry.grid(row=2, column=1, padx=2)
-        ttk.Button(self.top, text="Add Item", command=self.add_item).pack(pady=15)
-        ttk.Button(self.top, text="Cancel", command=self.top.destroy).pack()
+        
+        ttk.Label(self.top, text="Purchase Price (€):").pack(pady=5)
+        self.price_entry = ttk.Entry(self.top)
+        self.price_entry.pack(pady=5, fill=tk.X, padx=20)
+        
+        ttk.Label(self.top, text="Date of Purchase:").pack(pady=5)
+        self.date_entry = ttk.Entry(self.top)
+        self.date_entry.insert(0, datetime.now().strftime("%Y-%m-%d"))
+        self.date_entry.pack(pady=5, fill=tk.X, padx=20)
+        
+        ttk.Label(self.top, text="Current Value (€):").pack(pady=5)
+        self.value_entry = ttk.Entry(self.top)
+        self.value_entry.pack(pady=5, fill=tk.X, padx=20)
+        
+        # Add buttons
+        button_frame = ttk.Frame(self.top)
+        button_frame.pack(pady=20, fill=tk.X, padx=20)
+        ttk.Button(button_frame, text="Add", command=self.add_item).pack(side=tk.LEFT, padx=5)
+        ttk.Button(button_frame, text="Cancel", command=self.top.destroy).pack(side=tk.RIGHT, padx=5)
 
     def add_item(self):
         """Add a new item to the portfolio."""
@@ -1122,25 +1120,55 @@ class MainDashboard:
         canvas.get_tk_widget().pack(fill=tk.BOTH, expand=True)
 
     def show_topright_buttons(self, parent):
-        """Create top-right control buttons.
+        """Create top-right control buttons organized by category.
         
         Args:
             parent (ttk.Frame): Parent frame for the buttons
         """
         button_frame = ttk.Frame(parent)
         button_frame.pack(expand=True, fill=tk.BOTH, pady=20)
-        ttk.Button(button_frame, text="View Items", command=self.open_portfolio_window).pack(pady=10, padx=20, fill=tk.X)
-        ttk.Button(button_frame, text="Add Item", command=self.add_item_gui).pack(pady=10, padx=20, fill=tk.X)
 
-    def open_portfolio_window(self):
-        """Open the portfolio management window."""
+        # Investments Section
+        investments_frame = ttk.LabelFrame(button_frame, text="Investments", padding="5")
+        investments_frame.pack(fill=tk.X, padx=10, pady=5)
+        ttk.Button(investments_frame, text="View Investments", 
+                  command=lambda: self.open_portfolio_window("Investment")).pack(pady=5, padx=10, fill=tk.X)
+        ttk.Button(investments_frame, text="Add Investment", 
+                  command=lambda: self.add_item_gui("Investment")).pack(pady=5, padx=10, fill=tk.X)
+
+        # Inventory Section
+        inventory_frame = ttk.LabelFrame(button_frame, text="Inventory", padding="5")
+        inventory_frame.pack(fill=tk.X, padx=10, pady=5)
+        ttk.Button(inventory_frame, text="View Items", 
+                  command=lambda: self.open_portfolio_window("Inventory")).pack(pady=5, padx=10, fill=tk.X)
+        ttk.Button(inventory_frame, text="Add Item", 
+                  command=lambda: self.add_item_gui("Inventory")).pack(pady=5, padx=10, fill=tk.X)
+
+        # Expenses Section
+        expenses_frame = ttk.LabelFrame(button_frame, text="Expenses", padding="5")
+        expenses_frame.pack(fill=tk.X, padx=10, pady=5)
+        ttk.Button(expenses_frame, text="View Expenses", 
+                  command=lambda: self.open_portfolio_window("Expense")).pack(pady=5, padx=10, fill=tk.X)
+        ttk.Button(expenses_frame, text="Add Expense", 
+                  command=lambda: self.add_item_gui("Expense")).pack(pady=5, padx=10, fill=tk.X)
+
+    def open_portfolio_window(self, category=None):
+        """Open the portfolio management window.
+        
+        Args:
+            category (str, optional): Category of items to display. Defaults to None.
+        """
         # Pass only the Toplevel to PersonalFinanceApp
-        self.show_window('portfolio', PersonalFinanceApp)
+        self.show_window('portfolio', PersonalFinanceApp, category)
 
-    def add_item_gui(self):
-        """Open the add item dialog."""
+    def add_item_gui(self, category=None):
+        """Open the add item dialog.
+        
+        Args:
+            category (str, optional): Category of item to add. Defaults to None.
+        """
         # Pass MainDashboard's root as the parent_for_modality
-        self.show_window('add_item', AddItemDialog, self.root, self.db, self.refresh_dashboard)
+        self.show_window('add_item', AddItemDialog, self.root, self.db, self.refresh_dashboard, category)
 
     def refresh_dashboard(self):
         """Refresh all dashboard components."""
@@ -1171,45 +1199,31 @@ class PersonalFinanceApp:
         portfolio_tree (ttk.Treeview): Treeview widget displaying portfolio items
         right_panel (ttk.Frame): Frame containing right panel controls
     """
-    def __init__(self, top_level_root):
+    def __init__(self, top_level_root, category=None):
         set_theme(top_level_root, light_mode=True)
-        self.root = top_level_root # self.root is now the Toplevel provided by MainDashboard
-        self.root.title("Portfolio")
+        self.root = top_level_root
+        self.root.title(f"{category if category else 'All'} Portfolio")
         self.root.geometry("1000x600")
         self.db = Database()
+        self.category = category
+        
         # Create main container
         self.main_frame = ttk.Frame(self.root, padding="10")
         self.main_frame.grid(row=0, column=0, sticky=(tk.W, tk.E, tk.N, tk.S))
         self.main_frame.columnconfigure(0, weight=1)
         self.main_frame.columnconfigure(1, weight=3)
         self.main_frame.rowconfigure(0, weight=1)
+        
         # Create right panel for displaying portfolio
         self.right_panel = ttk.Frame(self.main_frame)
         self.right_panel.grid(row=0, column=1, sticky="nsew", padx=5, pady=5)
         self.create_right_panel(self.right_panel)
+        
         # Load initial data
         self.load_portfolio_gui()
-        # Track open windows specific to PersonalFinanceApp (e.g., PerformanceGraphDialog, PurchasesDialog)
-        self.open_windows = {}
-
-    def show_window(self, window_type, window_class, *args, **kwargs):
-        """Show a new window of the specified type.
         
-        Args:
-            window_type (str): Type of window to show
-            window_class (class): Class of the window to instantiate
-            *args: Additional positional arguments for window initialization
-            **kwargs: Additional keyword arguments for window initialization
-        """
-        top_level_window = self.open_windows.get(window_type)
-        if top_level_window and top_level_window.winfo_exists():
-            top_level_window.lift()
-            top_level_window.focus_force()
-        else:
-            new_toplevel = tk.Toplevel(self.root)
-            window_instance = window_class(new_toplevel, *args, **kwargs)
-            self.open_windows[window_type] = new_toplevel
-            new_toplevel.protocol("WM_DELETE_WINDOW", lambda: self.on_window_close(window_type))
+        # Track open windows specific to PersonalFinanceApp
+        self.open_windows = {}
 
     def create_right_panel(self, parent):
         """Create the right panel with action buttons.
@@ -1217,18 +1231,24 @@ class PersonalFinanceApp:
         Args:
             parent (ttk.Frame): Parent frame for the panel
         """
-        right_frame = ttk.LabelFrame(parent, text="Portfolio", padding="10")
+        right_frame = ttk.LabelFrame(parent, text=f"{self.category if self.category else 'All'} Portfolio", padding="10")
         right_frame.pack(fill=tk.BOTH, expand=True)
+        
+        # Create treeview
         columns = ('ID', 'Name', 'Purchase Price', 'Date', 'Current Value', 'Profit/Loss', 'Category')
         self.tree = ttk.Treeview(right_frame, columns=columns, show='headings')
         for col in columns:
             self.tree.heading(col, text=col)
             self.tree.column(col, width=100)
         self.tree.column('ID', width=0, stretch=False)
+        
+        # Add scrollbar
         scrollbar = ttk.Scrollbar(right_frame, orient=tk.VERTICAL, command=self.tree.yview)
         self.tree.configure(yscrollcommand=scrollbar.set)
         self.tree.grid(row=0, column=0, sticky=(tk.W, tk.E, tk.N, tk.S))
         scrollbar.grid(row=0, column=1, sticky=(tk.N, tk.S))
+        
+        # Add buttons
         button_frame = ttk.Frame(right_frame)
         button_frame.grid(row=1, column=0, columnspan=2, pady=10)
         ttk.Button(button_frame, text="Export Portfolio", command=self.export_portfolio_gui).pack(side=tk.LEFT, padx=5)
@@ -1237,34 +1257,45 @@ class PersonalFinanceApp:
         ttk.Button(button_frame, text="Delete Selected", command=self.delete_selected).pack(side=tk.LEFT, padx=5)
         ttk.Button(button_frame, text="View Performance", command=self.show_performance).pack(side=tk.LEFT, padx=5)
         ttk.Button(button_frame, text="View/Add Purchases", command=self.view_purchases).pack(side=tk.LEFT, padx=5)
+        
+        # Add total value label
         self.total_value_label = ttk.Label(right_frame, text="Total Value: €0.00")
         self.total_value_label.grid(row=2, column=0, columnspan=2, pady=5)
 
-    def update_portfolio_display(self):
-        """Update the portfolio treeview with current data."""
+    def load_portfolio_gui(self):
+        """Load portfolio data from the database."""
         # Clear existing items
-        for item_in_tree in self.tree.get_children():
-            self.tree.delete(item_in_tree)
+        for item in self.tree.get_children():
+            self.tree.delete(item)
             
         # Get items from main.py's load_portfolio, which returns rich Item objects
         from main import load_portfolio
-        self.items = load_portfolio() # Store loaded items in self.items
+        self.items = load_portfolio()  # Store loaded items in self.items
+        
+        # Filter items based on category if specified
+        if self.category:
+            if self.category == "Investment":
+                self.items = [item for item in self.items if item.category in ['Stocks', 'Bonds', 'Crypto', 'Real Estate', 'Gold']]
+            elif self.category == "Inventory":
+                self.items = [item for item in self.items if item.category in ['Appliances', 'Electronics', 'Furniture', 'Transportation', 'Home Improvement', 'Savings', 'Collectibles']]
+            elif self.category == "Expense":
+                self.items = [item for item in self.items if item.category == "Expense"]
 
         # Fetch current stock prices for calculation
         current_prices = {}
         stock_names_to_fetch = set()
         for item in self.items:
             if item.category in ['Stocks', 'Bonds']:
-                stock_names_to_fetch.add(item.name) # Use the item name as ticker
+                stock_names_to_fetch.add(item.name)  # Use the item name as ticker
         
         for stock_name in stock_names_to_fetch:
             ticker_symbol = stock_name.split()[0] if ' ' in stock_name else stock_name
-            price = 0.0 # Default to 0
+            price = 0.0  # Default to 0
             # Try different exchange suffixes for VUSA or general tickers
             if ticker_symbol == 'VUSA':
                 exchanges = ['', '.L', '.AS', '.DE', '.PA', '.MI']
             else:
-                exchanges = [''] # For other tickers, try direct
+                exchanges = ['']  # For other tickers, try direct
             for suffix in exchanges:
                 try:
                     ticker_data = yf.Ticker(ticker_symbol + suffix).history(period="1d")
@@ -1276,6 +1307,7 @@ class PersonalFinanceApp:
             current_prices[stock_name] = price
 
         # Add items to treeview
+        total_portfolio_value = 0
         for item in self.items:
             display_purchase_price = ""
             display_current_value = ""
@@ -1284,40 +1316,35 @@ class PersonalFinanceApp:
 
             if item.category in ['Stocks', 'Bonds']:
                 total_invested = item.get_total_invested()
-                current_total_value = item.get_current_total_value(current_prices) # Pass prices
+                current_total_value = item.get_current_total_value(current_prices)
                 profit_loss = item.get_overall_profit_loss(current_prices)
                 most_recent_purchase_date = max(p.date for p in item.purchases) if item.purchases else ""
 
-                display_purchase_price = f"€{total_invested:.2f}" # Total invested
-                display_current_value = f"€{current_total_value:.2f}" # Current aggregated value
+                display_purchase_price = f"€{total_invested:.2f}"
+                display_current_value = f"€{current_total_value:.2f}"
                 display_profit_loss = f"€{profit_loss:.2f}"
                 display_date = most_recent_purchase_date
+                total_portfolio_value += current_total_value
 
-            else: # Household items and others
+            else:  # Household items and others
                 display_purchase_price = f"€{item.purchase_price:.2f}"
                 display_current_value = f"€{item.current_value:.2f}"
                 display_profit_loss = f"€{item.profit_loss:.2f}"
                 display_date = item.date_of_purchase
-            
+                total_portfolio_value += item.current_value
+
             # Store the actual Item object (or its ID) with the treeview row
-            # For editing/deleting later, we need to retrieve the original Item object
             self.tree.insert('', tk.END, values=(
                 item.id,  # ID
                 item.name,  # Name
-                display_purchase_price,  # Purchase Price (aggregated for stocks)
-                display_date,  # Date (most recent for stocks)
-                display_current_value,  # Current Value (aggregated for stocks)
-                display_profit_loss,  # Profit/Loss (aggregated for stocks)
-                item.category   # Category
-            ), iid=item.id) # Use item.id as iid for easy lookup
-            
-        # Update total portfolio value across all items
-        total_portfolio_value = 0
-        for item in self.items:
-            if item.category in ['Stocks', 'Bonds']:
-                total_portfolio_value += item.get_current_total_value(current_prices)
-            else:
-                total_portfolio_value += item.current_value
+                display_purchase_price,  # Purchase Price
+                display_date,  # Date
+                display_current_value,  # Current Value
+                display_profit_loss,  # Profit/Loss
+                item.category  # Category
+            ), iid=item.id)
+
+        # Update total value label
         self.total_value_label.config(text=f"Total Value: €{total_portfolio_value:.2f}")
 
     def edit_selected(self):
@@ -1425,10 +1452,6 @@ class PersonalFinanceApp:
                 CustomMessageBox(self.root, "Success", "Portfolio exported successfully!")
             except Exception as e:
                 CustomMessageBox(self.root, "Error", f"Error exporting portfolio: {str(e)}", type="error")                 
-
-    def load_portfolio_gui(self):
-        """Load portfolio data from a CSV file."""
-        self.update_portfolio_display()
 
 if __name__ == "__main__":
     root = tk.Tk()
