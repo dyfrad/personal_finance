@@ -1126,31 +1126,37 @@ class MainDashboard:
             parent (ttk.Frame): Parent frame for the buttons
         """
         button_frame = ttk.Frame(parent)
-        button_frame.pack(expand=True, fill=tk.BOTH, pady=20)
+        button_frame.pack(expand=True, fill=tk.BOTH, pady=10)
 
         # Investments Section
         investments_frame = ttk.LabelFrame(button_frame, text="Investments", padding="5")
         investments_frame.pack(fill=tk.X, padx=10, pady=5)
-        ttk.Button(investments_frame, text="View Investments", 
-                  command=lambda: self.open_portfolio_window("Investment")).pack(pady=5, padx=10, fill=tk.X)
-        ttk.Button(investments_frame, text="Add Investment", 
-                  command=lambda: self.add_item_gui("Investment")).pack(pady=5, padx=10, fill=tk.X)
+        investments_buttons = ttk.Frame(investments_frame)
+        investments_buttons.pack(fill=tk.X, padx=5, pady=5)
+        ttk.Button(investments_buttons, text="View", 
+                  command=lambda: self.open_portfolio_window("Investment")).pack(side=tk.LEFT, expand=True, fill=tk.X, padx=2)
+        ttk.Button(investments_buttons, text="Add", 
+                  command=lambda: self.add_item_gui("Investment")).pack(side=tk.LEFT, expand=True, fill=tk.X, padx=2)
 
         # Inventory Section
         inventory_frame = ttk.LabelFrame(button_frame, text="Inventory", padding="5")
         inventory_frame.pack(fill=tk.X, padx=10, pady=5)
-        ttk.Button(inventory_frame, text="View Items", 
-                  command=lambda: self.open_portfolio_window("Inventory")).pack(pady=5, padx=10, fill=tk.X)
-        ttk.Button(inventory_frame, text="Add Item", 
-                  command=lambda: self.add_item_gui("Inventory")).pack(pady=5, padx=10, fill=tk.X)
+        inventory_buttons = ttk.Frame(inventory_frame)
+        inventory_buttons.pack(fill=tk.X, padx=5, pady=5)
+        ttk.Button(inventory_buttons, text="View", 
+                  command=lambda: self.open_portfolio_window("Inventory")).pack(side=tk.LEFT, expand=True, fill=tk.X, padx=2)
+        ttk.Button(inventory_buttons, text="Add", 
+                  command=lambda: self.add_item_gui("Inventory")).pack(side=tk.LEFT, expand=True, fill=tk.X, padx=2)
 
         # Expenses Section
         expenses_frame = ttk.LabelFrame(button_frame, text="Expenses", padding="5")
         expenses_frame.pack(fill=tk.X, padx=10, pady=5)
-        ttk.Button(expenses_frame, text="View Expenses", 
-                  command=lambda: self.open_portfolio_window("Expense")).pack(pady=5, padx=10, fill=tk.X)
-        ttk.Button(expenses_frame, text="Add Expense", 
-                  command=lambda: self.add_item_gui("Expense")).pack(pady=5, padx=10, fill=tk.X)
+        expenses_buttons = ttk.Frame(expenses_frame)
+        expenses_buttons.pack(fill=tk.X, padx=5, pady=5)
+        ttk.Button(expenses_buttons, text="View", 
+                  command=lambda: self.open_portfolio_window("Expense")).pack(side=tk.LEFT, expand=True, fill=tk.X, padx=2)
+        ttk.Button(expenses_buttons, text="Add", 
+                  command=lambda: self.add_item_gui("Expense")).pack(side=tk.LEFT, expand=True, fill=tk.X, padx=2)
 
     def open_portfolio_window(self, category=None):
         """Open the portfolio management window.
