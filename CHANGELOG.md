@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/en/2.0.0/).
 
-## [0.2.0] - 2024-12-19
+## [0.2.0] - 2025-06-19
 ### Added
 - **Comprehensive Testing Architecture**: 33 focused tests covering critical functionality
   - 13 critical application functionality tests
@@ -99,7 +99,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/en/2.0.0/).
 - **Performance Validation**: Load testing with realistic data volumes
 - **Documentation**: Living documentation through tests and ADRs
 
-## [0.1.0] - 2024-05-20
+## [0.1.0] - 2025-06-13
 ### Added
 - Initial implementation of a Tkinter GUI for the Personal Finance Manager application.
 - Basic SQLite database integration for persistent storage of financial items.
