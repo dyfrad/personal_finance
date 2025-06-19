@@ -120,8 +120,10 @@ source venv/bin/activate  # On Windows: venv\Scripts\activate
 # Install the application
 pip install -e .
 
-# Run the application
-personal-finance-manager
+# Run the application (choose one):
+personal-finance-manager    # Full version with database protection
+python main.py             # Full version with database protection and CLI options
+python gui.py              # Simple GUI only (no protection features)
 ```
 
 ### Alternative Installation
@@ -129,8 +131,9 @@ personal-finance-manager
 # Install dependencies directly
 pip install -r requirements.txt
 
-# Run from source
-python main.py
+# Run from source (choose one):
+python main.py             # Full version with database protection
+python gui.py              # Simple GUI only
 ```
 
 ### Database Protection (Automatic)
@@ -154,7 +157,9 @@ python scripts/protect_database.py restore backup_name --confirm
 ## Usage Guide
 
 ### Getting Started
-1. **Launch the Application**: Run `personal-finance-manager` or `python main.py`
+1. **Launch the Application**: Choose your preferred method:
+   - **Full Version**: `personal-finance-manager` or `python main.py` (includes database protection)
+   - **Simple Version**: `python gui.py` (GUI only, no protection features)
 2. **Dashboard Overview**: The main dashboard shows four key areas:
    - **Top Left**: Stock performance graph with technical indicators
    - **Top Right**: Quick action buttons (View Portfolio, Add Items)
