@@ -53,21 +53,23 @@ class Item:
     def get_total_invested(self):
         """Calculates the total amount invested in the item.
         
-        For stocks/bonds, sums up all purchase amounts (shares * price). For other items,
-        returns the initial purchase price.
+        If purchases exist, sums up all purchase amounts (quantity × price).
+        Otherwise, returns the initial purchase price.
         
         Returns:
             float: Total amount invested in the item
         """
-        if self.category in ['Stocks', 'Bonds'] and self.purchases:
-            return sum(p.amount * p.price for p in self.purchases)  # Total money invested, not just shares
-        return self.purchase_price # For non-stock items
+        if self.purchases:
+            return sum(p.amount * p.price for p in self.purchases)
+        return self.purchase_price
 
     def get_current_total_value(self, current_price_lookup=None):
         """Calculates the current total value of the item.
         
-        For stocks/bonds, uses current price lookup to calculate total value.
-        For other items, returns the stored current value.
+        If purchases exist and current prices are available for investments,
+        calculates total value using current market prices. For inventory items
+        with purchases, uses the most recent purchase price as current value.
+        Otherwise, returns the stored current value.
         
         Args:
             current_price_lookup (dict, optional): Dictionary mapping item names to current prices
@@ -75,14 +77,16 @@ class Item:
         Returns:
             float: Current total value of the item
         """
-        if self.category in ['Stocks', 'Bonds'] and self.purchases:
-            if current_price_lookup:
+        if self.purchases:
+            # For investments with current price lookup, use market prices
+            if self.category in ['Stocks', 'Bonds', 'Crypto', 'Real Estate', 'Gold'] and current_price_lookup:
                 if self.name in current_price_lookup:
                     price_per_unit = current_price_lookup[self.name]
                 else:
                     price_per_unit = self.purchases[-1].price if self.purchases else 1
                 return sum(p.amount * price_per_unit for p in self.purchases)
             else:
+                # For inventory items or investments without market data, use purchase prices
                 return sum(p.amount * p.price for p in self.purchases)
         return self.current_value
 
@@ -141,7 +145,8 @@ def save_portfolio(items):
             item.name, item.purchase_price, item.date_of_purchase,
             item.current_value, item.profit_loss, item.category, now, now
         )
-        if item.category in ['Stocks', 'Bonds'] and item.purchases:
+        # Save purchases for all item types (not just Stocks and Bonds)
+        if item.purchases:
             for purchase in item.purchases:
                 db.add_purchase(item_id, purchase)
 
@@ -161,10 +166,10 @@ def load_portfolio():
         item_id, name, purchase_price, date_of_purchase, current_value, profit_loss, category, created_at, updated_at = row
         item = Item(name, category, purchase_price, date_of_purchase, current_value, profit_loss)
         item.id = item_id
-        if category in ['Stocks', 'Bonds']:
-            purchases_data = db.get_purchases_for_item(item_id)
-            for p_date, p_amount, p_price in purchases_data:
-                item.add_purchase(Purchase(p_date, p_amount, p_price))
+        # Load purchases for all item types (not just Stocks and Bonds)
+        purchases_data = db.get_purchases_for_item(item_id)
+        for p_date, p_amount, p_price in purchases_data:
+            item.add_purchase(Purchase(p_date, p_amount, p_price))
         items.append(item)
     return items
 # %%

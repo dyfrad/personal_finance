@@ -659,18 +659,20 @@ class PurchasesDialog:
     """Dialog window for managing item purchases.
     
     Provides a modal dialog window for viewing, adding, and managing
-    purchase records for stocks and bonds.
+    purchase records for investments and inventory items.
     
     Attributes:
         top (tk.Toplevel): The dialog window
         db (Database): Database connection for data operations
         item_id (int): ID of the item being managed
         item_name (str): Name of the item being managed
+        item_category (str): Category of the item being managed
         tree (ttk.Treeview): Treeview widget displaying purchases
     """
-    def __init__(self, top_level_root, parent_for_modality, db, item_id, item_name):
+    def __init__(self, top_level_root, parent_for_modality, db, item_id, item_name, item_category):
         self.db = db
         self.item_id = item_id
+        self.item_category = item_category
         self.top = top_level_root # Use the Toplevel provided by show_window
         set_theme(self.top, light_mode=True) # Apply light theme
         self.top.title(f"Purchases for {item_name}")
@@ -689,10 +691,22 @@ class PurchasesDialog:
         y = (self.top.winfo_screenheight() // 2) - (height // 2)
         self.top.geometry(f'{width}x{height}+{x}+{y}')
 
+        # Determine labels based on item category
+        if self.item_category in ['Stocks', 'Bonds', 'Crypto', 'Real Estate', 'Gold']:
+            # For investments
+            amount_label = "Shares/Units"
+            price_label = "Price per Unit"
+        else:
+            # For inventory items
+            amount_label = "Quantity"
+            price_label = "Unit Price"
+
         # Purchases list
         self.tree = ttk.Treeview(self.top, columns=("Date", "Amount", "Price"), show='headings') # master is self.top
+        self.tree.heading("Date", text="Date")
+        self.tree.heading("Amount", text=amount_label)
+        self.tree.heading("Price", text=price_label)
         for col in ("Date", "Amount", "Price"):
-            self.tree.heading(col, text=col)
             self.tree.column(col, width=120)
         self.tree.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
         self.refresh_tree()
@@ -705,9 +719,9 @@ class PurchasesDialog:
         self.price_entry = ttk.Entry(add_frame)
         ttk.Label(add_frame, text="Date (YYYY-MM-DD)").grid(row=0, column=0, padx=5, pady=2)
         self.date_entry.grid(row=0, column=1, padx=5, pady=2)
-        ttk.Label(add_frame, text="Amount").grid(row=1, column=0, padx=5, pady=2)
+        ttk.Label(add_frame, text=amount_label).grid(row=1, column=0, padx=5, pady=2)
         self.amount_entry.grid(row=1, column=1, padx=5, pady=2)
-        ttk.Label(add_frame, text="Price").grid(row=2, column=0, padx=5, pady=2)
+        ttk.Label(add_frame, text=price_label).grid(row=2, column=0, padx=5, pady=2)
         self.price_entry.grid(row=2, column=1, padx=5, pady=2)
         ttk.Button(add_frame, text="Add", command=self.add_purchase).grid(row=3, column=0, columnspan=2, pady=5)
 
@@ -727,7 +741,10 @@ class PurchasesDialog:
             amount = float(self.amount_entry.get())
             price = float(self.price_entry.get())
         except ValueError:
-            messagebox.showerror("Error", "Amount and Price must be numbers.")
+            if self.item_category in ['Stocks', 'Bonds', 'Crypto', 'Real Estate', 'Gold']:
+                messagebox.showerror("Error", "Shares/Units and Price per Unit must be numbers.")
+            else:
+                messagebox.showerror("Error", "Quantity and Unit Price must be numbers.")
             return
         if not date:
             messagebox.showerror("Error", "Date is required.")
@@ -1546,14 +1563,18 @@ class PersonalFinanceApp:
             return
         # Retrieve the Item object from self.items using its ID
         item_to_view_purchases = next((item for item in self.items if str(item.id) == selected_item_id), None)
-        if item_to_view_purchases and item_to_view_purchases.category in ['Stocks', 'Bonds']:
-            # Create a unique key for this purchases window
-            window_key = f'purchases_{selected_item_id}'
-            # Use the new show_window method - don't pass self.root as extra arg
-            self.show_window(window_key, PurchasesDialog, self.db, item_to_view_purchases.id, item_to_view_purchases.name)
-            self.load_portfolio_gui() # Refresh display after purchases are added/modified
+        if item_to_view_purchases:
+            # Allow purchases for both investments and inventory items
+            if item_to_view_purchases.category in ['Stocks', 'Bonds', 'Crypto', 'Real Estate', 'Gold', 'Appliances', 'Electronics', 'Furniture', 'Transportation', 'Home Improvement', 'Savings', 'Collectibles']:
+                # Create a unique key for this purchases window
+                window_key = f'purchases_{selected_item_id}'
+                # Use the new show_window method - don't pass self.root as extra arg
+                self.show_window(window_key, PurchasesDialog, self.db, item_to_view_purchases.id, item_to_view_purchases.name, item_to_view_purchases.category)
+                self.load_portfolio_gui() # Refresh display after purchases are added/modified
+            else:
+                CustomMessageBox(self.root, "Info", "Purchase details are only available for Investment and Inventory items.", type="info")
         else:
-            CustomMessageBox(self.root, "Info", "Purchase details are only available for Stocks and Bonds.", type="info")
+            CustomMessageBox(self.root, "Error", "Item not found.", type="error")
 
     def on_window_close(self, window_key):
         """Handle window close event.
