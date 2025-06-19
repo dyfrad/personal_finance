@@ -41,16 +41,16 @@ def format_datetime(iso_string: str) -> str:
         return iso_string
 
 def cmd_backup(args):
-    """Create a database backup."""
+    """Create database backup."""
     protection = init_protection(args.database)
     
     try:
         backup_path = protection.create_backup(args.name)
-        print(f"✅ Backup created successfully!")
+        print(f"Backup created successfully!")
         print(f"   Path: {backup_path}")
         print(f"   Size: {format_size(backup_path.stat().st_size)}")
     except Exception as e:
-        print(f"❌ Backup failed: {e}")
+        print(f"Backup failed: {e}")
         sys.exit(1)
 
 def cmd_protect(args):
@@ -59,11 +59,11 @@ def cmd_protect(args):
     
     try:
         protection.protect_database()
-        print("🔒 Database protection applied successfully!")
+        print("Database protection applied successfully!")
         print("   Database is now read-only protected")
         print("   Use 'unprotect' command to remove protection for operations")
     except Exception as e:
-        print(f"❌ Protection failed: {e}")
+        print(f"Protection failed: {e}")
         sys.exit(1)
 
 def cmd_unprotect(args):
@@ -72,11 +72,11 @@ def cmd_unprotect(args):
     
     try:
         protection.unprotect_database()
-        print("🔓 Database protection removed successfully!")
+        print("Database protection removed successfully!")
         print("   Database is now writable")
         print("   Remember to reapply protection after operations")
     except Exception as e:
-        print(f"❌ Unprotection failed: {e}")
+        print(f"Unprotection failed: {e}")
         sys.exit(1)
 
 def cmd_status(args):
@@ -86,16 +86,16 @@ def cmd_status(args):
     try:
         status = protection.status()
         
-        print("📊 Database Protection Status")
+        print("Database Protection Status")
         print("=" * 40)
         print(f"Database: {status['database_path']}")
-        print(f"Exists: {'✅ Yes' if status['database_exists'] else '❌ No'}")
+        print(f"Exists: {'Yes' if status['database_exists'] else 'No'}")
         
         if status['database_exists']:
             print(f"Size: {format_size(status['database_size'])}")
         
-        print(f"Protection: {'🔒 Enabled' if status['protection_enabled'] else '🔓 Disabled'}")
-        print(f"Auto Backup: {'✅ Enabled' if status['auto_backup_enabled'] else '❌ Disabled'}")
+        print(f"Protection: {'Enabled' if status['protection_enabled'] else 'Disabled'}")
+        print(f"Auto Backup: {'Enabled' if status['auto_backup_enabled'] else 'Disabled'}")
         print(f"Backup Count: {status['backup_count']}")
         print(f"Backup Directory: {status['backup_dir']}")
         
@@ -109,7 +109,7 @@ def cmd_status(args):
             print(f"Latest Backup: {latest['name']} ({format_size(latest['size'])})")
     
     except Exception as e:
-        print(f"❌ Status check failed: {e}")
+        print(f"Status check failed: {e}")
         sys.exit(1)
 
 def cmd_list_backups(args):
@@ -120,10 +120,10 @@ def cmd_list_backups(args):
         backups = protection.list_backups()
         
         if not backups:
-            print("📂 No backups found")
+            print("No backups found")
             return
         
-        print(f"📂 Available Backups ({len(backups)})")
+        print(f"Available Backups ({len(backups)})")
         print("=" * 80)
         print(f"{'Name':<40} {'Size':<10} {'Created':<20}")
         print("-" * 80)
@@ -135,13 +135,13 @@ def cmd_list_backups(args):
             print(f"{name:<40} {size:<10} {created:<20}")
     
     except Exception as e:
-        print(f"❌ Listing backups failed: {e}")
+        print(f"Listing backups failed: {e}")
         sys.exit(1)
 
 def cmd_restore(args):
     """Restore database from backup."""
     if not args.confirm:
-        print("❌ Restoration requires --confirm flag for safety")
+        print("Restoration requires --confirm flag for safety")
         print("   This operation will overwrite your current database!")
         sys.exit(1)
     
@@ -164,29 +164,29 @@ def cmd_restore(args):
                 if len(matches) == 1:
                     backup_path = str(matches[0])
                 elif len(matches) > 1:
-                    print(f"❌ Multiple backups match '{args.backup}':")
+                    print(f"Multiple backups match '{args.backup}':")
                     for match in matches:
                         print(f"   {match.name}")
                     sys.exit(1)
         
         if not backup_path:
-            print(f"❌ Backup not found: {args.backup}")
+            print(f"Backup not found: {args.backup}")
             sys.exit(1)
         
-        print(f"⚠️  About to restore database from: {backup_path}")
+        print(f"About to restore database from: {backup_path}")
         print(f"   This will overwrite: {protection.db_path}")
         
         if not args.force:
             response = input("   Are you sure? (type 'yes' to confirm): ")
             if response.lower() != 'yes':
-                print("❌ Restoration cancelled")
+                print("Restoration cancelled")
                 sys.exit(0)
         
         protection.restore_backup(backup_path, confirm=True)
-        print("✅ Database restored successfully!")
+        print("Database restored successfully!")
     
     except Exception as e:
-        print(f"❌ Restoration failed: {e}")
+        print(f"Restoration failed: {e}")
         sys.exit(1)
 
 def cmd_auto_backup(args):
@@ -195,9 +195,9 @@ def cmd_auto_backup(args):
     
     try:
         protection.auto_backup_if_needed()
-        print("✅ Auto backup check completed")
+        print("Auto backup check completed")
     except Exception as e:
-        print(f"❌ Auto backup failed: {e}")
+        print(f"Auto backup failed: {e}")
         sys.exit(1)
 
 def cmd_config(args):
@@ -218,10 +218,10 @@ def cmd_config(args):
         
         protection.config[key] = value
         protection._save_config()
-        print(f"✅ Configuration updated: {key} = {value}")
+        print(f"Configuration updated: {key} = {value}")
     else:
         # Show current configuration
-        print("⚙️  Database Protection Configuration")
+        print("Database Protection Configuration")
         print("=" * 40)
         for key, value in protection.config.items():
             print(f"{key}: {value}")

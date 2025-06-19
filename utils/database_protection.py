@@ -128,7 +128,7 @@ class DatabaseProtection:
         self.config["last_backup"] = datetime.now().isoformat()
         self._save_config()
         
-        print(f"✅ Database backup created: {backup_path}")
+        print(f"Database backup created: {backup_path}")
         return backup_path
     
     def _verify_database_integrity(self):
@@ -169,7 +169,7 @@ class DatabaseProtection:
         if len(backup_files) > max_backups:
             for old_backup in backup_files[max_backups:]:
                 old_backup.unlink()
-                print(f"🗑️  Removed old backup: {old_backup}")
+                print(f"Removed old backup: {old_backup}")
         
         # Remove backups older than retention period
         retention_days = self.config["backup_retention_days"]
@@ -178,25 +178,25 @@ class DatabaseProtection:
         for backup_file in backup_files:
             if backup_file.stat().st_mtime < cutoff_time:
                 backup_file.unlink()
-                print(f"🗑️  Removed expired backup: {backup_file}")
+                print(f"Removed expired backup: {backup_file}")
     
     def protect_database(self):
         """Apply protection mechanisms to the database file."""
         if not self.config["protection_enabled"]:
-            print("⚠️  Database protection is disabled")
+            print("Database protection is disabled")
             return
         
         # Make database read-only for additional protection
         current_mode = self.db_path.stat().st_mode
         os.chmod(self.db_path, current_mode & ~0o222)  # Remove write permissions
-        print(f"🔒 Database protection applied: {self.db_path}")
+        print(f"Database protection applied: {self.db_path}")
     
     def unprotect_database(self):
         """Remove protection mechanisms from the database file."""
         # Restore write permissions
         current_mode = self.db_path.stat().st_mode
         os.chmod(self.db_path, current_mode | 0o644)  # Restore write permissions
-        print(f"🔓 Database protection removed: {self.db_path}")
+        print(f"Database protection removed: {self.db_path}")
     
     def safe_database_operation(self, operation_name: str = "database_operation"):
         """
@@ -256,8 +256,8 @@ class DatabaseProtection:
                 
                 # Restore backup
                 shutil.copy2(backup_file, self.db_path)
-                print(f"✅ Database restored from: {backup_path}")
-                print(f"💾 Safety backup created: {safety_backup}")
+                print(f"Database restored from: {backup_path}")
+                print(f"Safety backup created: {safety_backup}")
         
         except Exception as e:
             # Restore from safety backup if restoration fails
@@ -303,11 +303,11 @@ class SafeDatabaseOperation:
             if exc_type is None:
                 # Operation succeeded, create post-operation backup
                 self.protection.create_backup(f"post_{self.operation_name}")
-                print(f"✅ Safe operation completed: {self.operation_name}")
+                print(f"Safe operation completed: {self.operation_name}")
             else:
                 # Operation failed, consider restoring from backup
-                print(f"❌ Operation failed: {self.operation_name}")
-                print(f"💾 Pre-operation backup available: {self.pre_operation_backup}")
+                print(f"Operation failed: {self.operation_name}")
+                print(f"Pre-operation backup available: {self.pre_operation_backup}")
         finally:
             # Always reapply protection
             self.protection.protect_database()

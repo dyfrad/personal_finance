@@ -1,4 +1,4 @@
-# 🔒 Database Protection Quick Start
+# Database Protection Quick Start
 
 ## Essential Commands
 
@@ -41,7 +41,7 @@ python scripts/protect_database.py list-backups
 python scripts/protect_database.py restore backup_name --confirm
 ```
 
-## 🚨 CRITICAL SAFETY FEATURES
+## CRITICAL SAFETY FEATURES
 
 1. **Database is automatically protected (read-only) to prevent accidental deletion**
 2. **Automatic backups every 6 hours** 
@@ -49,14 +49,14 @@ python scripts/protect_database.py restore backup_name --confirm
 4. **Multiple confirmation required for restoration**
 5. **Safety backups created before restoration attempts**
 
-## 🛡️ What's Protected
+## What's Protected
 
-- ✅ **Main database (`finance.db`)** - Your financial data
-- ✅ **Automatic time-based backups** (every 6 hours)
-- ✅ **Operation-triggered backups** (before major changes)
-- ✅ **Application startup/shutdown backups**
+- **Main database (`finance.db`)** - Your financial data
+- **Automatic time-based backups** (every 6 hours)
+- **Operation-triggered backups** (before major changes)
+- **Application startup/shutdown backups**
 
-## 📁 File Locations
+## File Locations
 
 ```
 personal_finance/
@@ -68,7 +68,7 @@ personal_finance/
 └── database_protection.json     # Protection settings
 ```
 
-## ⚡ Quick Recovery
+## Quick Recovery
 
 If you lose your database:
 
@@ -77,7 +77,7 @@ If you lose your database:
 3. **Restore**: `python scripts/protect_database.py restore latest_backup --confirm`
 4. **Verify**: Start app and check your data
 
-## 🔧 Configuration
+## Configuration
 
 View/change settings:
 ```bash
@@ -91,14 +91,14 @@ python scripts/protect_database.py config --set backup_interval_hours=12
 python scripts/protect_database.py config --set max_backups=20
 ```
 
-## ⚠️ Important Notes
+## Important Notes
 
 - **Protection is AUTOMATIC** - your database is protected by default
 - **Backups happen AUTOMATICALLY** - no manual intervention needed
 - **Restoration requires CONFIRMATION** - prevents accidents
 - **Application handles protection** - works seamlessly with GUI
 
-## 💡 Best Practices
+## Best Practices
 
 1. **Let protection run automatically** - don't disable unless necessary
 2. **Create named backups before major changes**: 
@@ -107,10 +107,10 @@ python scripts/protect_database.py config --set max_backups=20
    `python scripts/protect_database.py status`
 4. **Test restoration occasionally** to ensure backups work
 
-## 🆘 Emergency Contacts
+## Emergency Contacts
 
 - Check logs: `app.log`
 - Debug mode: `python main.py --debug`
 - Protection status: `python main.py --check-protection`
 
-**Your financial data is now AUTOMATICALLY PROTECTED against accidental deletion!** 🛡️ 
+**Your financial data is now AUTOMATICALLY PROTECTED against accidental deletion!** 

@@ -36,20 +36,20 @@ def main():
     
     if check_only:
         if migration_needed:
-            print("❓ Migration needed: Old 'items' table contains data")
+            print("Migration needed: Old 'items' table contains data")
             sys.exit(1)
         else:
-            print("✅ Migration not needed: Database already using new structure")
+            print("Migration not needed: Database already using new structure")
             sys.exit(0)
     
     if not migration_needed:
-        print("✅ Database already migrated or no migration needed.")
+        print("Database already migrated or no migration needed.")
         print("   All items are already in category-specific tables.")
         return
     
     if not auto_mode:
         # Ask for confirmation in interactive mode
-        print("📊 This will move items from 'items' table to:")
+        print("This will move items from 'items' table to:")
         print("   • investments (Stocks, Bonds, Crypto, etc.)")
         print("   • inventory (Appliances, Electronics, etc.)")  
         print("   • expenses (Expense category)")
@@ -65,10 +65,10 @@ def main():
     # Run migration
     try:
         migrated_count = db.migrate_items_to_category_tables()
-        print(f"✅ Migration successful! {migrated_count} items migrated.")
+        print(f"Migration successful! {migrated_count} items migrated.")
         
         # Show summary of items in each table
-        print("\n📊 Summary after migration:")
+        print("\nSummary after migration:")
         investments = db.get_table_items('investments')
         inventory = db.get_table_items('inventory')
         expenses = db.get_table_items('expenses')
@@ -78,12 +78,12 @@ def main():
         print(f"   Inventory: {len(inventory)} items")
         print(f"   Expenses: {len(expenses)} items")
         if remaining_items:
-            print(f"   ⚠️  Remaining in items table: {len(remaining_items)} items")
+            print(f"   Remaining in items table: {len(remaining_items)} items")
         
-        print("\n🎉 Database migration completed successfully!")
+        print("\nDatabase migration completed successfully!")
         
     except Exception as e:
-        print(f"❌ Migration failed: {e}")
+        print(f"Migration failed: {e}")
         sys.exit(1)
 
 if __name__ == "__main__":

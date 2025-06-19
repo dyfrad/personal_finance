@@ -2,38 +2,38 @@
 
 A sophisticated Python-based personal finance management application that helps you track and manage your financial portfolio with advanced features for investments, inventory, and expenses.
 
-**🔒 PRIVATE PROJECT**: This is a personal finance application designed for individual use. All data is stored locally and privately.
+**PRIVATE PROJECT**: This is a personal finance application designed for individual use. All data is stored locally and privately.
 
-## ✨ Key Features
+## Key Features
 
-### 📊 Portfolio Management
+### Portfolio Management
 - **Investment Tracking**: Manage stocks, bonds, crypto, real estate, and gold with multiple purchase tracking
 - **Inventory Management**: Track appliances, electronics, furniture, transportation, home improvements, savings, and collectibles
 - **Expense Tracking**: Record and monitor expenses with simplified entry forms
 - **Multi-Purchase Support**: Track multiple purchases for investment items with detailed transaction history
 
-### 📈 Advanced Analytics
+### Advanced Analytics
 - **Performance Graphs**: Real-time stock performance visualization with technical indicators
 - **Technical Analysis**: Moving averages (SMA, EMA), RSI, MACD indicators
 - **Interactive Charts**: Hover details, comparison features, and historical data analysis
 - **Profit/Loss Calculations**: Accurate financial calculations for all item types
 
-### 🎨 Modern User Interface
+### Modern User Interface
 - **Four-Quadrant Dashboard**: Organized layout with stock performance, expenses, and action buttons
 - **Google Material Design**: Professional theme with light/dark mode support
 - **Category-Specific Forms**: Tailored input forms for investments, inventory, and expenses
 - **Responsive Design**: Optimized for different screen sizes and platforms
 
-### 🔧 Data Management
+### Data Management
 - **Multiple Database Tables**: Separate tables for investments, inventory, and expenses
 - **Purchase History**: Detailed transaction tracking with table-specific context
 - **Export/Import**: CSV export functionality for data portability
 - **Data Integrity**: Comprehensive validation and error handling
-- **🔒 Database Protection**: Automatic protection against accidental deletion with read-only permissions
-- **📦 Automatic Backups**: Every 6 hours + event-driven backups with configurable retention
-- **🚨 Emergency Recovery**: Multiple confirmation layers and safety backups for restoration
+- **Database Protection**: Automatic protection against accidental deletion with read-only permissions
+- **Automatic Backups**: Every 6 hours + event-driven backups with configurable retention
+- **Emergency Recovery**: Multiple confirmation layers and safety backups for restoration
 
-### 🛡️ Quality Assurance
+### Quality Assurance
 - **33 Comprehensive Tests**: Complete test coverage for critical functionality
 - **Database Protection Framework**: Comprehensive safeguards against accidental data loss
 - **Automatic Backup System**: Time-based and event-driven backups with integrity verification
@@ -41,7 +41,7 @@ A sophisticated Python-based personal finance management application that helps 
 - **Data Validation**: Input validation to prevent data corruption
 - **Performance Testing**: Verified with large portfolios (50+ items, 20+ purchases per item)
 
-## 🚀 Installation
+## Installation
 
 ### Prerequisites
 - Python 3.7 or higher
@@ -73,7 +73,7 @@ pip install -r requirements.txt
 python main.py
 ```
 
-### 🔒 Database Protection (Automatic)
+### Database Protection (Automatic)
 Your database is automatically protected against accidental deletion:
 
 ```bash
@@ -91,7 +91,7 @@ python scripts/protect_database.py restore backup_name --confirm
 
 **Note**: The protection framework runs automatically - no manual setup required! See [PROTECTION_QUICK_START.md](PROTECTION_QUICK_START.md) for details.
 
-## 📋 Usage Guide
+## Usage Guide
 
 ### Getting Started
 1. **Launch the Application**: Run `personal_finance` or `python main.py`
@@ -120,7 +120,7 @@ python scripts/protect_database.py restore backup_name --confirm
 - **Theme Switching**: Toggle between light and dark modes
 - **Real-time Updates**: Live stock data integration (when available)
 
-## 🏗️ Architecture
+## Architecture
 
 ### Project Structure
 ```
@@ -169,7 +169,7 @@ personal_finance/
 - **Testing**: pytest with 33 comprehensive tests
 - **Configuration**: JSON-based config management
 
-## 🧪 Testing
+## Testing
 
 ### Test Coverage
 The application includes **33 comprehensive tests** covering:
@@ -197,7 +197,7 @@ Current status: **33/33 tests passing (100% success rate)**
 
 For detailed test coverage information, see `tests/TEST_COVERAGE_SUMMARY.md`.
 
-## 🔧 Configuration
+## Configuration
 
 ### Application Settings (`config.json`)
 ```json
@@ -224,7 +224,7 @@ For detailed test coverage information, see `tests/TEST_COVERAGE_SUMMARY.md`.
 - `FINANCE_CONFIG_PATH`: Custom configuration file path
 - `FINANCE_DEBUG`: Enable debug mode
 
-## 🐛 Troubleshooting
+## Troubleshooting
 
 ### Common Issues
 
@@ -250,7 +250,7 @@ For detailed test coverage information, see `tests/TEST_COVERAGE_SUMMARY.md`.
 2. Run tests to verify system integrity: `python -m pytest tests/`
 3. Review the Architectural Decision Records in `docs/adr/`
 
-## 📚 Documentation
+## Documentation
 
 ### Architectural Decision Records
 - [ADR 001: Flexible Item Model](docs/adr/001-flexible-item-model.md)
@@ -266,7 +266,7 @@ For detailed test coverage information, see `tests/TEST_COVERAGE_SUMMARY.md`.
 - `DATABASE_MIGRATION.md`: Database migration guide (if applicable)
 - `CHANGELOG.md`: Version history and updates
 
-## 🙏 Acknowledgments
+## Acknowledgments
 
 - **[yfinance](https://github.com/ranaroussi/yfinance)**: Real-time stock data
 - **[ta](https://github.com/bukosabino/ta)**: Technical analysis indicators
@@ -274,7 +274,7 @@ For detailed test coverage information, see `tests/TEST_COVERAGE_SUMMARY.md`.
 - **[tkinter](https://docs.python.org/3/library/tkinter.html)**: Cross-platform GUI framework
 - **[pytest](https://pytest.org/)**: Comprehensive testing framework
 
-## 🔒 Privacy & Security
+## Privacy & Security
 
 This is a **private personal finance application** designed for individual use:
 
@@ -286,4 +286,4 @@ This is a **private personal finance application** designed for individual use:
 
 ---
 
-**Built with ❤️ for personal finance management**
+**Built with love for personal finance management**

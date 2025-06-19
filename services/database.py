@@ -15,7 +15,7 @@ try:
     PROTECTION_AVAILABLE = True
 except ImportError:
     PROTECTION_AVAILABLE = False
-    print("⚠️  Database protection not available")
+    print("Database protection not available")
 
 logger = get_logger(__name__)
 

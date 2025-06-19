@@ -302,11 +302,11 @@ Examples:
     if args.check_protection:
         if protection:
             status = protection.status()
-            print("🔒 Database Protection Status")
+            print("Database Protection Status")
             print("=" * 40)
             print(f"Database: {status['database_path']}")
-            print(f"Protection: {'✅ Enabled' if status['protection_enabled'] else '❌ Disabled'}")
-            print(f"Auto Backup: {'✅ Enabled' if status['auto_backup_enabled'] else '❌ Disabled'}")
+            print(f"Protection: {'Enabled' if status['protection_enabled'] else 'Disabled'}")
+            print(f"Auto Backup: {'Enabled' if status['auto_backup_enabled'] else 'Disabled'}")
             print(f"Backup Count: {status['backup_count']}")
             print(f"Last Backup: {status['last_backup'] or 'Never'}")
             
@@ -316,7 +316,7 @@ Examples:
                 for backup in backups[:3]:  # Show last 3 backups
                     print(f"  • {backup['name']}")
         else:
-            print("❌ Database protection not available")
+            print("Database protection not available")
         return
     
     # Handle backup request
@@ -324,16 +324,16 @@ Examples:
         if protection:
             try:
                 backup_path = protection.create_backup("manual_startup")
-                print(f"✅ Backup created: {backup_path}")
+                print(f"Backup created: {backup_path}")
             except Exception as e:
-                print(f"❌ Backup failed: {e}")
+                print(f"Backup failed: {e}")
                 sys.exit(1)
         else:
-            print("⚠️  Database protection not available - backup skipped")
+            print("Database protection not available - backup skipped")
     
     # Handle console mode (future feature)
     if args.console:
-        print("🚧 Console mode not yet implemented")
+        print("Console mode not yet implemented")
         print("   Starting GUI application instead...")
     
     # Start GUI application
@@ -370,14 +370,14 @@ Examples:
         
     except ImportError as e:
         logger.error(f"Failed to import GUI module: {e}")
-        print("❌ Error: GUI module not found")
+        print("Error: GUI module not found")
         print("   Please ensure all dependencies are installed:")
         print("   pip install -r requirements.txt")
         sys.exit(1)
         
     except Exception as e:
         logger.error(f"Application error: {e}")
-        print(f"❌ Application error: {e}")
+        print(f"Application error: {e}")
         
         # Ensure protection is reapplied even on error
         if protection:

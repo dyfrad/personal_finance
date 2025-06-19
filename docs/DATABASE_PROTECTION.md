@@ -1,30 +1,30 @@
 # Database Protection Framework
 
-## 🔒 Overview
+## Overview
 
 The Database Protection Framework provides comprehensive safeguards against accidental deletion, corruption, or data loss in your personal finance application. It implements multiple layers of protection including automatic backups, file permissions, integrity checks, and safe operation contexts.
 
-## ✨ Features
+## Features
 
-### 🛡️ Core Protection
+### Core Protection
 - **Read-only Protection**: Makes database file read-only to prevent accidental writes
 - **File Locking**: Prevents concurrent access during critical operations
 - **Integrity Verification**: SQLite PRAGMA integrity checks before operations
 - **Checksum Validation**: SHA256 verification of backup files
 
-### 📦 Automatic Backups
+### Automatic Backups
 - **Time-based Backups**: Automatic backups every 6 hours (configurable)
 - **Event-driven Backups**: Backups before critical operations
 - **Retention Policy**: Automatic cleanup of old backups
 - **Backup Verification**: Ensures backup integrity before use
 
-### 🔧 Safe Operations
+### Safe Operations
 - **Context Managers**: Safe database operation wrappers
 - **Pre/Post Operation Backups**: Automatic backup creation around operations
 - **Rollback Capability**: Easy restoration from backups
 - **Error Recovery**: Automatic reversion on operation failures
 
-## 📋 Quick Start
+## Quick Start
 
 ### Command Line Interface
 
@@ -70,7 +70,7 @@ from utils.database_protection import create_backup
 backup_path = create_backup()
 ```
 
-## 🚀 Application Startup Integration
+## Application Startup Integration
 
 The framework is automatically integrated into the main application:
 
@@ -85,7 +85,7 @@ python main.py --check-protection
 python main.py --debug
 ```
 
-## ⚙️ Configuration
+## Configuration
 
 The protection framework uses `database_protection.json` for configuration:
 
@@ -123,7 +123,7 @@ python scripts/protect_database.py config --set backup_interval_hours=12
 python scripts/protect_database.py config --set max_backups=5
 ```
 
-## 📁 Directory Structure
+## Directory Structure
 
 ```
 personal_finance/
@@ -137,7 +137,7 @@ personal_finance/
 └── .finance.lock                # Lock file (temporary)
 ```
 
-## 🔄 Backup Types
+## Backup Types
 
 ### Automatic Backups
 - **Time-based**: Created every N hours based on configuration
@@ -160,7 +160,7 @@ Examples:
 - before_update_20250619_190000.db  # Named backup
 ```
 
-## 🛠️ Advanced Usage
+## Advanced Usage
 
 ### Safe Database Operations
 
@@ -207,7 +207,7 @@ protection.restore_backup("backup_name.db", confirm=True)
 python scripts/protect_database.py restore backup_name --confirm --force
 ```
 
-## 🚨 Safety Features
+## Safety Features
 
 ### Multiple Confirmation Layers
 1. **Explicit Confirmation**: Restoration requires `confirm=True` parameter
@@ -227,7 +227,7 @@ python scripts/protect_database.py restore backup_name --confirm --force
 - **Checksum Verification**: Ensures backup file integrity
 - **Atomic Operations**: All-or-nothing database changes
 
-## 📊 Monitoring and Status
+## Monitoring and Status
 
 ### Status Information
 ```bash
@@ -253,31 +253,31 @@ python scripts/protect_database.py backup --name "weekly_backup"
 python scripts/protect_database.py auto-backup
 ```
 
-## 🔧 Troubleshooting
+## Troubleshooting
 
 ### Common Issues
 
 #### Protection Not Available
 ```
-⚠️  Database protection not available
+Database protection not available
 ```
 **Solution**: Install missing dependencies or check import paths
 
 #### Database Locked
 ```
-❌ Database is locked by another process
+Database is locked by another process
 ```
 **Solution**: Close other application instances or wait for lock to clear
 
 #### Backup Verification Failed
 ```
-❌ Backup verification failed: checksums don't match
+Backup verification failed: checksums don't match
 ```
 **Solution**: Check disk space and file permissions, retry backup
 
 #### Permission Denied
 ```
-❌ Permission denied: Cannot write to database
+Permission denied: Cannot write to database
 ```
 **Solution**: Remove protection temporarily with `unprotect` command
 
@@ -298,7 +298,7 @@ python scripts/protect_database.py auto-backup
 2. Restart application to regenerate default config
 3. Adjust settings as needed
 
-## 🔐 Security Considerations
+## Security Considerations
 
 ### File Permissions
 - Database files are set to read-only when protected
@@ -316,7 +316,7 @@ python scripts/protect_database.py auto-backup
 - Lock files prevent concurrent access
 - Database operations are logged for audit
 
-## 📈 Best Practices
+## Best Practices
 
 ### Regular Maintenance
 1. **Monitor Backup Status**: Check backup count and dates regularly
@@ -336,7 +336,7 @@ python scripts/protect_database.py auto-backup
 3. **Storage Location**: Use fast storage for backup directory
 4. **Cleanup Schedule**: Regular cleanup of old files
 
-## 🔄 Integration with Application
+## Integration with Application
 
 The protection framework is seamlessly integrated:
 
@@ -347,7 +347,7 @@ The protection framework is seamlessly integrated:
 
 This ensures your financial data is always protected without requiring manual intervention.
 
-## 📞 Support
+## Support
 
 For issues with the database protection framework:
 
