@@ -818,46 +818,72 @@ class AddItemDialog:
             if date:
                 date_of_purchase = date
 
-        # Insert item
-        now = datetime.now().isoformat()
+        # Handle investment items (stocks/bonds)
         conn = sqlite3.connect(self.db.db_name)
         cursor = conn.cursor()
-        cursor.execute('''
-        INSERT INTO items (name, purchase_price, date_of_purchase, current_value, profit_loss, category, created_at, updated_at)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-        ''', (name, purchase_price, date_of_purchase, current_value, profit_loss, category, now, now))
-        item_id = cursor.lastrowid
-
-        # For stocks/bonds, add the purchase if provided
+        
         if category in ['Stocks', 'Bonds']:
+            # Validate required fields for investments
             if not date:
                 messagebox.showerror("Error", "Date is required for investments.")
-                conn.commit()
                 conn.close()
                 return
             if not amount:
                 messagebox.showerror("Error", "Number of shares/units is required for investments.")
-                conn.commit()
                 conn.close()
                 return
             if not price:
                 messagebox.showerror("Error", "Price per share/unit is required for investments.")
-                conn.commit()
                 conn.close()
                 return
             
             try:
                 amount = float(amount)
                 price = float(price)
+            except ValueError:
+                messagebox.showerror("Error", "Amount and Price must be valid numbers.")
+                conn.close()
+                return
+            
+            # Check if item with same name and category already exists
+            cursor.execute('''
+            SELECT id FROM items WHERE name = ? AND category = ?
+            ''', (name, category))
+            existing_item = cursor.fetchone()
+            
+            if existing_item:
+                # Add purchase to existing item
+                item_id = existing_item[0]
                 cursor.execute('''
                 INSERT INTO purchases (item_id, date, amount, price) VALUES (?, ?, ?, ?)
                 ''', (item_id, date, amount, price))
-                print(f"DEBUG: Created purchase record - Item ID: {item_id}, Date: {date}, Amount: {amount}, Price: {price}")
-            except ValueError:
-                messagebox.showerror("Error", "Amount and Price must be valid numbers.")
-                conn.commit()
-                conn.close()
-                return
+                print(f"DEBUG: Added purchase to existing item - Item ID: {item_id}, Date: {date}, Amount: {amount}, Price: {price}")
+                
+                # Update the item's date to the most recent purchase date
+                cursor.execute('''
+                UPDATE items SET date_of_purchase = ?, updated_at = ? WHERE id = ?
+                ''', (date, datetime.now().isoformat(), item_id))
+            else:
+                # Create new item
+                now = datetime.now().isoformat()
+                cursor.execute('''
+                INSERT INTO items (name, purchase_price, date_of_purchase, current_value, profit_loss, category, created_at, updated_at)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                ''', (name, purchase_price, date_of_purchase, current_value, profit_loss, category, now, now))
+                item_id = cursor.lastrowid
+                
+                # Add purchase record
+                cursor.execute('''
+                INSERT INTO purchases (item_id, date, amount, price) VALUES (?, ?, ?, ?)
+                ''', (item_id, date, amount, price))
+                print(f"DEBUG: Created new item with purchase - Item ID: {item_id}, Date: {date}, Amount: {amount}, Price: {price}")
+        else:
+            # For non-investment items, always create new item
+            now = datetime.now().isoformat()
+            cursor.execute('''
+            INSERT INTO items (name, purchase_price, date_of_purchase, current_value, profit_loss, category, created_at, updated_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            ''', (name, purchase_price, date_of_purchase, current_value, profit_loss, category, now, now))
 
         conn.commit()
         conn.close()
