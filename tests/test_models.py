@@ -45,7 +45,7 @@ def test_item_get_total_invested():
     stock_item = Item(name="Test Stock", category="Stocks")
     stock_item.add_purchase(Purchase(date="2024-01-01", amount=10.0, price=10.0))
     stock_item.add_purchase(Purchase(date="2024-01-02", amount=5.0, price=12.0))
-    assert stock_item.get_total_invested() == 15.0  # Total shares
+    assert stock_item.get_total_invested() == 160.0  # Total invested: (10*10) + (5*12) = 160
 
 def test_item_get_current_total_value():
     """Test calculating current total value."""
