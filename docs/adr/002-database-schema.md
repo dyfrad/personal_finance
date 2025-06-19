@@ -147,12 +147,29 @@ The schema design is validated through comprehensive tests:
 - **Data integrity tests** validate foreign key relationships
 - **Migration tests** (when applicable) ensure data preservation
 
+## Protection and Security
+
+### Database Protection Framework (ADR 005)
+The schema is protected by a comprehensive protection framework that provides:
+- **Automatic Backups**: Time-based and event-driven backups preserve schema and data
+- **Read-only Protection**: File-level protection prevents accidental schema corruption
+- **Integrity Verification**: SQLite PRAGMA checks ensure schema consistency
+- **Safe Operations**: Context managers provide safe schema modifications
+
+### Data Security
+- **Backup Verification**: SHA256 checksums verify backup integrity
+- **Atomic Operations**: Schema changes are wrapped in transactions
+- **Error Recovery**: Failed operations automatically rollback schema changes
+- **Audit Trail**: All schema operations are logged for troubleshooting
+
 ## Related Decisions
 - ADR 001: Flexible Item Model - Defines the unified Item class interface
 - ADR 003: GUI Design - Determines how the schema is presented to users
+- ADR 005: Database Protection Framework - Provides comprehensive data protection
 
 ## Future Considerations
 - **Performance Optimization**: Consider indexing on frequently queried columns
 - **Schema Evolution**: Plan for adding new item categories or fields
 - **Data Archival**: Strategy for handling large transaction histories
-- **Reporting**: Optimized views for portfolio analysis and reporting 
+- **Reporting**: Optimized views for portfolio analysis and reporting
+- **Encryption**: Consider encrypting sensitive financial data at rest 

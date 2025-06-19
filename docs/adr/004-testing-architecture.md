@@ -141,6 +141,7 @@ python -m pytest tests/test_app_critical.py -v
 - **Execution Time**: < 2 seconds for full suite
 - **Coverage Focus**: Critical user journeys and data integrity
 - **Error Scenarios**: Database corruption, invalid data, system limits
+- **Protection Validation**: Database protection framework automatically safeguards test data
 
 ### Test Design Patterns
 
@@ -173,6 +174,7 @@ Automated tests are complemented by:
 - ADR 001: Flexible Item Model - Tests validate the item model implementation
 - ADR 002: Database Schema - Tests ensure schema integrity and operations
 - ADR 003: GUI Design - Future: GUI testing considerations
+- ADR 005: Database Protection Framework - Testing validates protection mechanisms
 
 ## Future Considerations
 - **GUI Testing**: Framework for automated GUI testing
