@@ -18,6 +18,7 @@ project_root = Path(__file__).parent
 sys.path.insert(0, str(project_root))
 
 from config.settings import ConfigManager
+from config.version import __version__, __app_name__, __description__, __author__
 from utils.logging import setup_logging, get_logger
 
 # Import database protection
@@ -220,7 +221,7 @@ def init_application():
     # Setup logging
     setup_logging(config_manager)
     logger = get_logger(__name__)
-    logger.info("Starting Personal Finance Manager v0.2.0")
+    logger.info(f"Starting {__app_name__} v{__version__}")
     
     # Initialize database protection
     if PROTECTION_AVAILABLE:
@@ -253,7 +254,7 @@ def init_application():
 def main():
     """Main application entry point."""
     parser = argparse.ArgumentParser(
-        description="Personal Finance Manager",
+        description=__app_name__,
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:

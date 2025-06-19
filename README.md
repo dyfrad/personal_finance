@@ -41,6 +41,66 @@ A sophisticated Python-based personal finance management application that helps 
 - **Data Validation**: Input validation to prevent data corruption
 - **Performance Testing**: Verified with large portfolios (50+ items, 20+ purchases per item)
 
+## Development
+
+### Version Management
+The application uses centralized version management to eliminate inconsistencies. All version information is stored in `config/version.py`:
+
+#### Quick Version Update
+```bash
+# Update version (updates config/version.py and CHANGELOG.md)
+python scripts/update_version.py 0.3.0
+```
+
+#### What Gets Updated Automatically
+- **`config/version.py`** - Central version information
+- **`CHANGELOG.md`** - New version entry with template
+- **`setup.py`** - Package version (imported from config/version.py)
+- **`main.py`** - Application startup version (imported from config/version.py)
+
+#### Manual Version Update (if needed)
+If you need to update version manually, only edit `config/version.py`:
+```python
+__version__ = "0.3.0"
+__app_name__ = "Personal Finance Manager"
+__author__ = "Mohit Saharan"
+__author_email__ = "mohit@msaharan.com"
+```
+
+#### Version Information Available
+```python
+from config.version import (
+    __version__, __app_name__, __description__, 
+    __author__, __author_email__, __github_url__,
+    __package_name__, __entry_point__
+)
+```
+
+#### Benefits
+- **Single Source of Truth**: Version only exists in one place
+- **No Inconsistencies**: Impossible to have different versions in different files
+- **Automated Updates**: One command updates everything
+- **Validation**: Ensures proper semantic versioning format (X.Y.Z)
+- **Documentation**: Automatically updates changelog
+
+### Development Workflow
+```bash
+# 1. Make your changes
+# 2. Update version when ready for release
+python scripts/update_version.py 0.3.0
+
+# 3. Update CHANGELOG.md with actual changes (not just version bump)
+# 4. Test the application
+python -m pytest tests/ -v
+
+# 5. Commit changes
+git add .
+git commit -m "feat: new feature in v0.3.0"
+
+# 6. Tag release (optional)
+git tag v0.3.0
+```
+
 ## Installation
 
 ### Prerequisites
@@ -94,7 +154,7 @@ python scripts/protect_database.py restore backup_name --confirm
 ## Usage Guide
 
 ### Getting Started
-1. **Launch the Application**: Run `personal_finance` or `python main.py`
+1. **Launch the Application**: Run `personal-finance-manager` or `python main.py`
 2. **Dashboard Overview**: The main dashboard shows four key areas:
    - **Top Left**: Stock performance graph with technical indicators
    - **Top Right**: Quick action buttons (View Portfolio, Add Items)
@@ -131,12 +191,14 @@ personal_finance/
 ├── services/              # Business logic layer
 │   └── database.py        # Database service (clean API)
 ├── config/                # Configuration management
-│   └── settings.py        # Application settings
+│   ├── settings.py        # Application settings
+│   └── version.py         # Centralized version information
 ├── utils/                 # Utility functions
 │   ├── logging.py         # Logging configuration
 │   └── database_protection.py  # Database protection framework
 ├── scripts/               # Command-line utilities
-│   └── protect_database.py     # Database protection CLI
+│   ├── protect_database.py     # Database protection CLI
+│   └── update_version.py       # Version management utility
 ├── tests/                 # Comprehensive test suite
 │   ├── test_app_critical.py      # Critical functionality tests
 │   ├── test_database.py          # Database operation tests
@@ -224,6 +286,22 @@ For detailed test coverage information, see `tests/TEST_COVERAGE_SUMMARY.md`.
 - `FINANCE_CONFIG_PATH`: Custom configuration file path
 - `FINANCE_DEBUG`: Enable debug mode
 
+### Version Configuration (`config/version.py`)
+The application uses centralized version management. All version information is stored in `config/version.py`:
+
+```python
+__version__ = "0.2.0"                    # Current version
+__app_name__ = "Personal Finance Manager" # Application name
+__author__ = "Mohit Saharan"             # Author name
+__author_email__ = "mohit@msaharan.com"  # Author email
+__github_url__ = "https://github.com/msaharan/personal_finance"
+__package_name__ = "personal-finance-manager"  # PyPI package name
+__entry_point__ = "personal-finance-manager"   # Console script name
+__description__ = "A sophisticated Python-based..."  # App description
+```
+
+**Important**: Only edit `config/version.py` directly if you need to change version information. For version updates, use the automated script: `python scripts/update_version.py <new_version>`.
+
 ## Troubleshooting
 
 ### Common Issues
@@ -265,6 +343,7 @@ For detailed test coverage information, see `tests/TEST_COVERAGE_SUMMARY.md`.
 - `tests/TEST_COVERAGE_SUMMARY.md`: Comprehensive test documentation
 - `DATABASE_MIGRATION.md`: Database migration guide (if applicable)
 - `CHANGELOG.md`: Version history and updates
+- `scripts/update_version.py`: Version management utility for automated version updates
 
 ## Acknowledgments
 
