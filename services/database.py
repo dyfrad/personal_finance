@@ -54,7 +54,8 @@ class Database:
             conn = sqlite3.connect(self.db_name)
             conn.row_factory = sqlite3.Row
             yield conn
-        except sqlite3.Error as e:
+        except sqlite3.OperationalError as e:
+            # Only catch actual connection errors, not query errors
             logger.error(f"Database connection error: {e}")
             raise DatabaseConnectionError(f"Could not connect to database: {e}")
         finally:
