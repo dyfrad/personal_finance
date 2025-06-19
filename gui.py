@@ -1398,12 +1398,18 @@ class PersonalFinanceApp:
         right_frame = ttk.LabelFrame(parent, text=f"{self.category if self.category else 'All'} Portfolio", padding="10")
         right_frame.pack(fill=tk.BOTH, expand=True)
         
-        # Create treeview
-        columns = ('ID', 'Name', 'Purchase Price', 'Date', 'Current Value', 'Profit/Loss', 'Category')
+        # Create treeview with different columns based on category
+        if self.category == "Expense":
+            columns = ('ID', 'Name', 'Category', 'Date', 'Amount')
+            column_widths = {'ID': 0, 'Name': 200, 'Category': 100, 'Date': 120, 'Amount': 100}
+        else:
+            columns = ('ID', 'Name', 'Purchase Price', 'Date', 'Current Value', 'Profit/Loss', 'Category')
+            column_widths = {'ID': 0, 'Name': 150, 'Purchase Price': 100, 'Date': 120, 'Current Value': 100, 'Profit/Loss': 100, 'Category': 100}
+        
         self.tree = ttk.Treeview(right_frame, columns=columns, show='headings')
         for col in columns:
             self.tree.heading(col, text=col)
-            self.tree.column(col, width=100)
+            self.tree.column(col, width=column_widths.get(col, 100))
         self.tree.column('ID', width=0, stretch=False)
         
         # Add scrollbar
@@ -1473,43 +1479,59 @@ class PersonalFinanceApp:
         # Add items to treeview
         total_portfolio_value = 0
         for item in self.items:
-            display_purchase_price = ""
-            display_current_value = ""
-            display_profit_loss = ""
-            display_date = ""
+            if self.category == "Expense":
+                # For expenses: show only Name, Category, Date, Amount
+                self.tree.insert('', tk.END, values=(
+                    item.id,  # ID (hidden)
+                    item.name,  # Name
+                    item.category,  # Category
+                    item.date_of_purchase,  # Date
+                    f"€{item.purchase_price:.2f}"  # Amount (stored as purchase_price)
+                ), iid=item.id)
+                # For expenses, don't add to total portfolio value (they're costs)
+            else:
+                # For investments and inventory: show all columns
+                display_purchase_price = ""
+                display_current_value = ""
+                display_profit_loss = ""
+                display_date = ""
 
-            if item.category in ['Stocks', 'Bonds']:
-                total_invested = item.get_total_invested()
-                current_total_value = item.get_current_total_value(current_prices)
-                profit_loss = item.get_overall_profit_loss(current_prices)
-                # Show date from main item record, not purchases (more reliable)
-                display_date = item.date_of_purchase
+                if item.category in ['Stocks', 'Bonds']:
+                    total_invested = item.get_total_invested()
+                    current_total_value = item.get_current_total_value(current_prices)
+                    profit_loss = item.get_overall_profit_loss(current_prices)
+                    # Show date from main item record, not purchases (more reliable)
+                    display_date = item.date_of_purchase
 
-                display_purchase_price = f"€{total_invested:.2f}"
-                display_current_value = f"€{current_total_value:.2f}"
-                display_profit_loss = f"€{profit_loss:.2f}"
-                total_portfolio_value += current_total_value
+                    display_purchase_price = f"€{total_invested:.2f}"
+                    display_current_value = f"€{current_total_value:.2f}"
+                    display_profit_loss = f"€{profit_loss:.2f}"
+                    total_portfolio_value += current_total_value
 
-            else:  # Household items and others
-                display_purchase_price = f"€{item.purchase_price:.2f}"
-                display_current_value = f"€{item.current_value:.2f}"
-                display_profit_loss = f"€{item.profit_loss:.2f}"
-                display_date = item.date_of_purchase
-                total_portfolio_value += item.current_value
+                else:  # Inventory items
+                    display_purchase_price = f"€{item.purchase_price:.2f}"
+                    display_current_value = f"€{item.current_value:.2f}"
+                    display_profit_loss = f"€{item.profit_loss:.2f}"
+                    display_date = item.date_of_purchase
+                    total_portfolio_value += item.current_value
 
-            # Store the actual Item object (or its ID) with the treeview row
-            self.tree.insert('', tk.END, values=(
-                item.id,  # ID
-                item.name,  # Name
-                display_purchase_price,  # Purchase Price
-                display_date,  # Date
-                display_current_value,  # Current Value
-                display_profit_loss,  # Profit/Loss
-                item.category  # Category
-            ), iid=item.id)
+                # Store the actual Item object (or its ID) with the treeview row
+                self.tree.insert('', tk.END, values=(
+                    item.id,  # ID
+                    item.name,  # Name
+                    display_purchase_price,  # Purchase Price
+                    display_date,  # Date
+                    display_current_value,  # Current Value
+                    display_profit_loss,  # Profit/Loss
+                    item.category  # Category
+                ), iid=item.id)
 
         # Update total value label
-        self.total_value_label.config(text=f"Total Value: €{total_portfolio_value:.2f}")
+        if self.category == "Expense":
+            total_expenses = sum(item.purchase_price for item in self.items)
+            self.total_value_label.config(text=f"Total Expenses: €{total_expenses:.2f}")
+        else:
+            self.total_value_label.config(text=f"Total Value: €{total_portfolio_value:.2f}")
 
     def edit_selected(self):
         """Edit the selected portfolio item."""
@@ -1609,8 +1631,11 @@ class PersonalFinanceApp:
             try:
                 with open(file_path, 'w', newline='') as csvfile:
                     writer = csv.writer(csvfile)
-                    # Write header
-                    writer.writerow(['ID', 'Name', 'Purchase Price', 'Date', 'Current Value', 'Profit/Loss', 'Category'])
+                    # Write header based on category
+                    if self.category == "Expense":
+                        writer.writerow(['ID', 'Name', 'Category', 'Date', 'Amount'])
+                    else:
+                        writer.writerow(['ID', 'Name', 'Purchase Price', 'Date', 'Current Value', 'Profit/Loss', 'Category'])
                     
                     # Write data
                     for item_id in self.tree.get_children():
