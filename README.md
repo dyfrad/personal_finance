@@ -2,6 +2,8 @@
 
 A sophisticated Python-based personal finance management application that helps you track and manage your financial portfolio with advanced features for investments, inventory, and expenses.
 
+**🔒 PRIVATE PROJECT**: This is a personal finance application designed for individual use. All data is stored locally and privately.
+
 ## ✨ Key Features
 
 ### 📊 Portfolio Management
@@ -47,8 +49,8 @@ A sophisticated Python-based personal finance management application that helps 
 
 ### Quick Start
 ```bash
-# Clone the repository
-git clone https://github.com/yourusername/personal_finance.git
+# Clone the repository (private)
+git clone <your-private-repo-url>
 cd personal_finance
 
 # Create and activate virtual environment
@@ -248,41 +250,6 @@ For detailed test coverage information, see `tests/TEST_COVERAGE_SUMMARY.md`.
 2. Run tests to verify system integrity: `python -m pytest tests/`
 3. Review the Architectural Decision Records in `docs/adr/`
 
-## 🤝 Contributing
-
-### Development Setup
-```bash
-# Clone and setup
-git clone https://github.com/yourusername/personal_finance.git
-cd personal_finance
-python -m venv venv
-source venv/bin/activate
-pip install -e .[dev]
-
-# Run tests
-python -m pytest tests/ -v
-
-# Code formatting
-black .
-flake8 .
-```
-
-### Contribution Guidelines
-1. **Fork** the repository
-2. **Create** a feature branch (`git checkout -b feature/amazing-feature`)
-3. **Add tests** for new functionality
-4. **Ensure** all tests pass (`python -m pytest`)
-5. **Update** documentation as needed
-6. **Commit** changes (`git commit -m 'Add amazing feature'`)
-7. **Push** to branch (`git push origin feature/amazing-feature`)
-8. **Create** a Pull Request
-
-### Code Standards
-- **Testing**: All new features must include tests
-- **Documentation**: Update ADRs for architectural changes
-- **Style**: Follow Black formatting and Flake8 linting
-- **Commits**: Use conventional commit messages
-
 ## 📚 Documentation
 
 ### Architectural Decision Records
@@ -307,9 +274,15 @@ flake8 .
 - **[tkinter](https://docs.python.org/3/library/tkinter.html)**: Cross-platform GUI framework
 - **[pytest](https://pytest.org/)**: Comprehensive testing framework
 
-## 📄 License
+## 🔒 Privacy & Security
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This is a **private personal finance application** designed for individual use:
+
+- **Local Data Storage**: All financial data is stored locally on your device
+- **No Cloud Services**: No data is transmitted to external servers
+- **Privacy First**: Your financial information remains completely private
+- **Data Sovereignty**: You maintain full control over your data
+- **Automatic Backups**: Local backup system protects against data loss
 
 ---
 
