@@ -53,14 +53,14 @@ class Item:
     def get_total_invested(self):
         """Calculates the total amount invested in the item.
         
-        For stocks/bonds, sums up all purchase amounts. For other items,
+        For stocks/bonds, sums up all purchase amounts (shares * price). For other items,
         returns the initial purchase price.
         
         Returns:
             float: Total amount invested in the item
         """
         if self.category in ['Stocks', 'Bonds'] and self.purchases:
-            return sum(p.amount for p in self.purchases)
+            return sum(p.amount * p.price for p in self.purchases)  # Total money invested, not just shares
         return self.purchase_price # For non-stock items
 
     def get_current_total_value(self, current_price_lookup=None):

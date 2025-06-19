@@ -829,15 +829,32 @@ class AddItemDialog:
         item_id = cursor.lastrowid
 
         # For stocks/bonds, add the purchase if provided
-        if category in ['Stocks', 'Bonds'] and date and amount and price:
+        if category in ['Stocks', 'Bonds']:
+            if not date:
+                messagebox.showerror("Error", "Date is required for investments.")
+                conn.commit()
+                conn.close()
+                return
+            if not amount:
+                messagebox.showerror("Error", "Number of shares/units is required for investments.")
+                conn.commit()
+                conn.close()
+                return
+            if not price:
+                messagebox.showerror("Error", "Price per share/unit is required for investments.")
+                conn.commit()
+                conn.close()
+                return
+            
             try:
                 amount = float(amount)
                 price = float(price)
                 cursor.execute('''
                 INSERT INTO purchases (item_id, date, amount, price) VALUES (?, ?, ?, ?)
                 ''', (item_id, date, amount, price))
+                print(f"DEBUG: Created purchase record - Item ID: {item_id}, Date: {date}, Amount: {amount}, Price: {price}")
             except ValueError:
-                messagebox.showerror("Error", "Amount and Price must be numbers.")
+                messagebox.showerror("Error", "Amount and Price must be valid numbers.")
                 conn.commit()
                 conn.close()
                 return
