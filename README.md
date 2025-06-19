@@ -4,6 +4,15 @@ A sophisticated Python-based personal finance management application that helps 
 
 **PRIVATE PROJECT**: This is a personal finance application designed for individual use. All data is stored locally and privately.
 
+## Application Overview
+![Personal Finance Manager Dashboard](docs/images/dashboard_0.2.0.png)
+
+The dashboard provides a comprehensive view of your financial portfolio with:
+- Real-time stock performance tracking with technical indicators
+- Expense monitoring with detailed visualization
+- Quick access controls for portfolio management
+- Reserved space for future feature expansion
+
 ## Key Features
 
 ### Portfolio Management
