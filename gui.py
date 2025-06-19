@@ -792,10 +792,11 @@ class AddItemDialog:
         
         if category == "Investment":
             ttk.Label(self.top, text="Number of Shares/Units:").pack(pady=5)
+            self.amount_entry = ttk.Entry(self.top)
+            self.amount_entry.pack(pady=5, fill=tk.X, padx=20)
         else:
-            ttk.Label(self.top, text="Amount/Quantity:").pack(pady=5)
-        self.amount_entry = ttk.Entry(self.top)
-        self.amount_entry.pack(pady=5, fill=tk.X, padx=20)
+            # For non-investment items, amount/quantity is not stored, so don't show the field
+            self.amount_entry = None
         
         if category != "Investment":
             ttk.Label(self.top, text="Current Value (€):").pack(pady=5)
@@ -821,7 +822,7 @@ class AddItemDialog:
 
         # Get purchase details
         date = self.date_entry.get().strip()
-        amount = self.amount_entry.get().strip()
+        amount = self.amount_entry.get().strip() if self.amount_entry else ""
         price = self.price_entry.get().strip()
 
         # Initialize values
