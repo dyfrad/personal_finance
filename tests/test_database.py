@@ -1,6 +1,7 @@
 import pytest
 from datetime import datetime
 from services.database import Database, DatabaseError, DatabaseConnectionError, DatabaseQueryError
+from models.item import Item
 
 def test_init_db(temp_db):
     """Test database initialization."""

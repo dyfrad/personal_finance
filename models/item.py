@@ -49,21 +49,23 @@ class Item:
     def get_total_invested(self) -> float:
         """Calculates the total amount invested in the item.
         
-        For stocks/bonds, sums up all purchase amounts. For other items,
-        returns the initial purchase price.
+        If purchases exist, sums up all purchase amounts (quantity × price).
+        Otherwise, returns the initial purchase price.
         
         Returns:
             float: Total amount invested in the item
         """
-        if self.category in ['Stocks', 'Bonds'] and self.purchases:
-            return sum(p.amount for p in self.purchases)
+        if self.purchases:
+            return sum(p.amount * p.price for p in self.purchases)
         return self.purchase_price
 
     def get_current_total_value(self, current_price_lookup: Optional[dict] = None) -> float:
         """Calculates the current total value of the item.
         
-        For stocks/bonds, uses current price lookup to calculate total value.
-        For other items, returns the stored current value.
+        If purchases exist and current prices are available for investments,
+        calculates total value using current market prices. For inventory items
+        with purchases, uses the most recent purchase price as current value.
+        Otherwise, returns the stored current value.
         
         Args:
             current_price_lookup (dict, optional): Dictionary mapping item names to current prices
@@ -71,14 +73,16 @@ class Item:
         Returns:
             float: Current total value of the item
         """
-        if self.category in ['Stocks', 'Bonds'] and self.purchases:
-            if current_price_lookup:
+        if self.purchases:
+            # For investments with current price lookup, use market prices
+            if self.category in ['Stocks', 'Bonds', 'Crypto', 'Real Estate', 'Gold'] and current_price_lookup:
                 if self.name in current_price_lookup:
                     price_per_unit = current_price_lookup[self.name]
                 else:
                     price_per_unit = self.purchases[-1].price if self.purchases else 1
                 return sum(p.amount * price_per_unit for p in self.purchases)
             else:
+                # For inventory items or investments without market data, use purchase prices
                 return sum(p.amount * p.price for p in self.purchases)
         return self.current_value
 

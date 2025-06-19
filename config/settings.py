@@ -1,6 +1,6 @@
 import os
 from typing import Dict, Any
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 import json
 
 @dataclass
@@ -14,15 +14,15 @@ class DatabaseConfig:
 class UIConfig:
     """UI configuration settings."""
     theme: str = "dark"  # or "light"
-    window_size: tuple = (1024, 768)
+    window_size: tuple = field(default_factory=lambda: (1024, 768))
     refresh_interval: int = 60  # seconds
     max_items_per_page: int = 50
 
 @dataclass
 class AppConfig:
     """Main application configuration."""
-    database: DatabaseConfig = DatabaseConfig()
-    ui: UIConfig = UIConfig()
+    database: DatabaseConfig = field(default_factory=DatabaseConfig)
+    ui: UIConfig = field(default_factory=UIConfig)
     debug: bool = False
     log_level: str = "INFO"
     log_file: str = "app.log"
