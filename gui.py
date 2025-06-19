@@ -153,17 +153,21 @@ class EditDialog:
                     if self.item.category not in ['Stocks', 'Bonds']:
                         entry.insert(0, str(self.item.purchase_price))
                     else:
-                        entry.config(state='disabled') # Not directly editable for stocks
+                        # For stocks/bonds, show total invested amount but make it read-only
+                        total_invested = self.item.get_total_invested() if hasattr(self.item, 'get_total_invested') else 0
+                        entry.insert(0, str(total_invested))
+                        entry.config(state='disabled')
                 elif field == 'Date of Purchase':
-                    if self.item.category not in ['Stocks', 'Bonds']:
-                        entry.insert(0, self.item.date_of_purchase)
-                    else:
-                        entry.config(state='disabled') # Not directly editable for stocks
+                    # Always show the date from the main item record
+                    entry.insert(0, self.item.date_of_purchase)
                 elif field == 'Current Value':
                     if self.item.category not in ['Stocks', 'Bonds']:
                         entry.insert(0, str(self.item.current_value))
                     else:
-                        entry.config(state='disabled') # Not directly editable for stocks
+                        # For stocks/bonds, show calculated current value but make it read-only
+                        current_total = self.item.get_current_total_value({}) if hasattr(self.item, 'get_current_total_value') else 0
+                        entry.insert(0, str(current_total))
+                        entry.config(state='disabled')
         
         # Add buttons
         button_frame = ttk.Frame(self.top)
@@ -189,6 +193,9 @@ class EditDialog:
                 self.item.date_of_purchase = self.entries['Date of Purchase'].get()
                 self.item.current_value = float(self.entries['Current Value'].get())
                 self.item.profit_loss = self.item.current_value - self.item.purchase_price
+            else:
+                # For stocks/bonds, allow editing of name, category, and date of purchase
+                self.item.date_of_purchase = self.entries['Date of Purchase'].get()
 
             self.result = self.item # Return the updated item
             self.top.destroy()
@@ -741,7 +748,11 @@ class AddItemDialog:
         self.category_var.set(categories[0])
         ttk.OptionMenu(self.top, self.category_var, self.category_var.get(), *categories).pack(pady=5, fill=tk.X, padx=20)
         
-        ttk.Label(self.top, text="Purchase Price (€):").pack(pady=5)
+        # Conditional field labels based on category
+        if category == "Investment":
+            ttk.Label(self.top, text="Price per Share/Unit (€):").pack(pady=5)
+        else:
+            ttk.Label(self.top, text="Purchase Price (€):").pack(pady=5)
         self.price_entry = ttk.Entry(self.top)
         self.price_entry.pack(pady=5, fill=tk.X, padx=20)
         
@@ -750,13 +761,20 @@ class AddItemDialog:
         self.date_entry.insert(0, datetime.now().strftime("%Y-%m-%d"))
         self.date_entry.pack(pady=5, fill=tk.X, padx=20)
         
-        ttk.Label(self.top, text="Amount/Quantity:").pack(pady=5)
+        if category == "Investment":
+            ttk.Label(self.top, text="Number of Shares/Units:").pack(pady=5)
+        else:
+            ttk.Label(self.top, text="Amount/Quantity:").pack(pady=5)
         self.amount_entry = ttk.Entry(self.top)
         self.amount_entry.pack(pady=5, fill=tk.X, padx=20)
         
-        ttk.Label(self.top, text="Current Value (€):").pack(pady=5)
-        self.value_entry = ttk.Entry(self.top)
-        self.value_entry.pack(pady=5, fill=tk.X, padx=20)
+        if category != "Investment":
+            ttk.Label(self.top, text="Current Value (€):").pack(pady=5)
+            self.value_entry = ttk.Entry(self.top)
+            self.value_entry.pack(pady=5, fill=tk.X, padx=20)
+        else:
+            # For investments, current value will be calculated automatically
+            self.value_entry = None
         
         # Add buttons
         button_frame = ttk.Frame(self.top)
@@ -783,17 +801,22 @@ class AddItemDialog:
         date_of_purchase = datetime.now().isoformat()
         profit_loss = 0
 
-        # For non-stock items, use the entered values if provided
+        # Handle form data based on category
         if category not in ['Stocks', 'Bonds']:
+            # For non-stock items, use the entered values if provided
             if date and price:  # Only date and price needed for non-stock items
                 try:
                     purchase_price = float(price)
-                    current_value = float(self.value_entry.get()) if self.value_entry.get().strip() else purchase_price
+                    current_value = float(self.value_entry.get()) if self.value_entry and self.value_entry.get().strip() else purchase_price
                     date_of_purchase = date
                     profit_loss = current_value - purchase_price
                 except ValueError:
                     messagebox.showerror("Error", "Price and Current Value must be numbers.")
                     return
+        else:
+            # For stocks/bonds, we'll store basic info and use purchases table for detailed data
+            if date:
+                date_of_purchase = date
 
         # Insert item
         now = datetime.now().isoformat()
@@ -1331,12 +1354,12 @@ class PersonalFinanceApp:
                 total_invested = item.get_total_invested()
                 current_total_value = item.get_current_total_value(current_prices)
                 profit_loss = item.get_overall_profit_loss(current_prices)
-                most_recent_purchase_date = max(p.date for p in item.purchases) if item.purchases else ""
+                # Show date from main item record, not purchases (more reliable)
+                display_date = item.date_of_purchase
 
                 display_purchase_price = f"€{total_invested:.2f}"
                 display_current_value = f"€{current_total_value:.2f}"
                 display_profit_loss = f"€{profit_loss:.2f}"
-                display_date = most_recent_purchase_date
                 total_portfolio_value += current_total_value
 
             else:  # Household items and others
@@ -1380,9 +1403,9 @@ class PersonalFinanceApp:
                         updated_item.profit_loss, updated_item.category, datetime.now().isoformat()
                     )
                 else:
-                    # For stocks/bonds, only update name and category in base item table
+                    # For stocks/bonds, update name, category, and date_of_purchase in base item table
                     self.db.update_base_item(
-                        updated_item.id, updated_item.name, 0, "", 0, 0, # Placeholders for derived values
+                        updated_item.id, updated_item.name, 0, updated_item.date_of_purchase, 0, 0, # Keep date, use placeholders for calculated values
                         updated_item.category, datetime.now().isoformat()
                     )
                 self.load_portfolio_gui() # Refresh the display
