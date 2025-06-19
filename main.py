@@ -147,8 +147,13 @@ def save_portfolio(items):
         )
         # Save purchases for all item types (not just Stocks and Bonds)
         if item.purchases:
+            # Determine table name based on category
+            if item.category in ['Stocks', 'Bonds', 'Crypto', 'Real Estate', 'Gold']:
+                table_name = 'investments'
+            else:
+                table_name = 'inventory'
             for purchase in item.purchases:
-                db.add_purchase(item_id, purchase)
+                db.add_purchase(item_id, purchase, table_name)
 
 def load_portfolio():
     """Loads the entire portfolio from the database.
@@ -167,7 +172,12 @@ def load_portfolio():
         item = Item(name, category, purchase_price, date_of_purchase, current_value, profit_loss)
         item.id = item_id
         # Load purchases for all item types (not just Stocks and Bonds)
-        purchases_data = db.get_purchases_for_item(item_id)
+        # Determine table name based on category
+        if category in ['Stocks', 'Bonds', 'Crypto', 'Real Estate', 'Gold']:
+            table_name = 'investments'
+        else:
+            table_name = 'inventory'
+        purchases_data = db.get_purchases_for_item(item_id, table_name)
         for p_date, p_amount, p_price in purchases_data:
             item.add_purchase(Purchase(p_date, p_amount, p_price))
         items.append(item)

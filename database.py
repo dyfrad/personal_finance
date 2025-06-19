@@ -77,15 +77,16 @@ class Database:
         )
         ''')
         
-        # Create purchases table (for investment transactions)
+        # Create purchases table for stocks/bonds
         cursor.execute('''
         CREATE TABLE IF NOT EXISTS purchases (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             item_id INTEGER NOT NULL,
+            table_name TEXT NOT NULL DEFAULT 'investments',
             date TEXT NOT NULL,
             amount REAL NOT NULL,
             price REAL NOT NULL,
-            FOREIGN KEY(item_id) REFERENCES investments(id)
+            FOREIGN KEY (item_id) REFERENCES items (id)
         )
         ''')
         
@@ -260,34 +261,36 @@ class Database:
         conn.commit()
         conn.close()
 
-    def add_purchase(self, item_id, purchase):
-        """Add a purchase record for a stock or bond.
+    def add_purchase(self, item_id, purchase, table_name='investments'):
+        """Add a purchase record for an item.
         
         Args:
             item_id (int): ID of the item this purchase belongs to
             purchase (object): Purchase object with date, amount, and price attributes
+            table_name (str): Name of the table the item belongs to ('investments' or 'inventory')
         """
         conn = sqlite3.connect(self.db_name)
         cursor = conn.cursor()
         cursor.execute('''
-        INSERT INTO purchases (item_id, date, amount, price)
-        VALUES (?, ?, ?, ?)
-        ''', (item_id, purchase.date, purchase.amount, purchase.price))
+        INSERT INTO purchases (item_id, table_name, date, amount, price)
+        VALUES (?, ?, ?, ?, ?)
+        ''', (item_id, table_name, purchase.date, purchase.amount, purchase.price))
         conn.commit()
         conn.close()
 
-    def get_purchases_for_item(self, item_id):
+    def get_purchases_for_item(self, item_id, table_name='investments'):
         """Retrieve all purchase records for a specific item.
         
         Args:
             item_id (int): ID of the item to get purchases for
+            table_name (str): Name of the table the item belongs to ('investments' or 'inventory')
             
         Returns:
             list: List of tuples containing (date, amount, price) for each purchase
         """
         conn = sqlite3.connect(self.db_name)
         cursor = conn.cursor()
-        cursor.execute('SELECT date, amount, price FROM purchases WHERE item_id = ?', (item_id,))
+        cursor.execute('SELECT date, amount, price FROM purchases WHERE item_id = ? AND table_name = ?', (item_id, table_name))
         rows = cursor.fetchall()
         conn.close()
         return rows
@@ -317,9 +320,9 @@ class Database:
                 if hasattr(item, 'purchases'):
                     for purchase in item.purchases:
                         cursor.execute('''
-                        INSERT INTO purchases (item_id, date, amount, price)
-                        VALUES (?, ?, ?, ?)
-                        ''', (item_id, purchase.date, purchase.amount, purchase.price))
+                        INSERT INTO purchases (item_id, table_name, date, amount, price)
+                        VALUES (?, ?, ?, ?, ?)
+                        ''', (item_id, 'investments', purchase.date, purchase.amount, purchase.price))
         conn.commit()
         conn.close()
 
@@ -436,12 +439,15 @@ class Database:
                 cursor.execute('SELECT * FROM purchases WHERE item_id = ?', (item_id,))
                 purchases = cursor.fetchall()
                 for purchase in purchases:
-                    # purchase structure: (id, item_id, date, amount, price)
-                    _, _, date, amount, price = purchase
+                    # purchase structure: (id, item_id, date, amount, price) or (id, item_id, table_name, date, amount, price)
+                    if len(purchase) == 5:
+                        _, _, date, amount, price = purchase
+                    else:
+                        _, _, _, date, amount, price = purchase
                     cursor.execute('''
-                    INSERT INTO purchases (item_id, date, amount, price)
-                    VALUES (?, ?, ?, ?)
-                    ''', (new_item_id, date, amount, price))
+                    INSERT INTO purchases (item_id, table_name, date, amount, price)
+                    VALUES (?, ?, ?, ?, ?)
+                    ''', (new_item_id, 'investments', date, amount, price))
                 
                 # Delete old purchase records
                 cursor.execute('DELETE FROM purchases WHERE item_id = ?', (item_id,))
