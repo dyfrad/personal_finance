@@ -794,34 +794,51 @@ class AddItemDialog:
         self.category_var.set(categories[0])
         ttk.OptionMenu(self.top, self.category_var, self.category_var.get(), *categories).pack(pady=5, fill=tk.X, padx=20)
         
-        # Conditional field labels based on category
-        if category == "Investment":
-            ttk.Label(self.top, text="Price per Share/Unit (€):").pack(pady=5)
-        else:
-            ttk.Label(self.top, text="Purchase Price (€):").pack(pady=5)
-        self.price_entry = ttk.Entry(self.top)
-        self.price_entry.pack(pady=5, fill=tk.X, padx=20)
-        
-        ttk.Label(self.top, text="Date of Purchase:").pack(pady=5)
-        self.date_entry = ttk.Entry(self.top)
-        self.date_entry.insert(0, datetime.now().strftime("%Y-%m-%d"))
-        self.date_entry.pack(pady=5, fill=tk.X, padx=20)
-        
-        if category == "Investment":
-            ttk.Label(self.top, text="Number of Shares/Units:").pack(pady=5)
+        # Create different forms based on category
+        if category == "Expense":
+            # For expenses: only show Date and Amount
+            ttk.Label(self.top, text="Date:").pack(pady=5)
+            self.date_entry = ttk.Entry(self.top)
+            self.date_entry.insert(0, datetime.now().strftime("%Y-%m-%d"))
+            self.date_entry.pack(pady=5, fill=tk.X, padx=20)
+            
+            ttk.Label(self.top, text="Amount (€):").pack(pady=5)
             self.amount_entry = ttk.Entry(self.top)
             self.amount_entry.pack(pady=5, fill=tk.X, padx=20)
-        else:
-            # For non-investment items, amount/quantity is not stored, so don't show the field
-            self.amount_entry = None
-        
-        if category != "Investment":
-            ttk.Label(self.top, text="Current Value (€):").pack(pady=5)
-            self.value_entry = ttk.Entry(self.top)
-            self.value_entry.pack(pady=5, fill=tk.X, padx=20)
-        else:
-            # For investments, current value will be calculated automatically
+            
+            # Set unused entries to None for expenses
+            self.price_entry = None
             self.value_entry = None
+            
+        else:
+            # For Investment and Inventory items: show price-related fields
+            if category == "Investment":
+                ttk.Label(self.top, text="Price per Share/Unit (€):").pack(pady=5)
+            else:
+                ttk.Label(self.top, text="Purchase Price (€):").pack(pady=5)
+            self.price_entry = ttk.Entry(self.top)
+            self.price_entry.pack(pady=5, fill=tk.X, padx=20)
+            
+            ttk.Label(self.top, text="Date of Purchase:").pack(pady=5)
+            self.date_entry = ttk.Entry(self.top)
+            self.date_entry.insert(0, datetime.now().strftime("%Y-%m-%d"))
+            self.date_entry.pack(pady=5, fill=tk.X, padx=20)
+            
+            if category == "Investment":
+                ttk.Label(self.top, text="Number of Shares/Units:").pack(pady=5)
+                self.amount_entry = ttk.Entry(self.top)
+                self.amount_entry.pack(pady=5, fill=tk.X, padx=20)
+            else:
+                # For inventory items, amount/quantity is not stored, so don't show the field
+                self.amount_entry = None
+            
+            if category != "Investment":
+                ttk.Label(self.top, text="Current Value (€):").pack(pady=5)
+                self.value_entry = ttk.Entry(self.top)
+                self.value_entry.pack(pady=5, fill=tk.X, padx=20)
+            else:
+                # For investments, current value will be calculated automatically
+                self.value_entry = None
         
         # Add buttons
         button_frame = ttk.Frame(self.top)
@@ -837,10 +854,10 @@ class AddItemDialog:
             messagebox.showerror("Error", "Name is required.")
             return
 
-        # Get purchase details
+        # Get form data
         date = self.date_entry.get().strip()
         amount = self.amount_entry.get().strip() if self.amount_entry else ""
-        price = self.price_entry.get().strip()
+        price = self.price_entry.get().strip() if self.price_entry else ""
 
         # Initialize values
         purchase_price = 0
@@ -849,8 +866,25 @@ class AddItemDialog:
         profit_loss = 0
 
         # Handle form data based on category
-        if category not in ['Stocks', 'Bonds']:
-            # For non-stock items, use the entered values if provided
+        if category == "Expense":
+            # For expenses: validate date and amount only
+            if not date:
+                messagebox.showerror("Error", "Date is required.")
+                return
+            if not amount:
+                messagebox.showerror("Error", "Amount is required.")
+                return
+            try:
+                expense_amount = float(amount)
+                purchase_price = expense_amount  # Store expense amount as purchase_price
+                current_value = 0  # Expenses don't have current value
+                date_of_purchase = date
+                profit_loss = -expense_amount  # Expenses are always negative profit
+            except ValueError:
+                messagebox.showerror("Error", "Amount must be a valid number.")
+                return
+        elif category not in ['Stocks', 'Bonds']:
+            # For inventory items, use the entered values if provided
             if date and price:  # Only date and price needed for non-stock items
                 try:
                     purchase_price = float(price)
@@ -865,23 +899,19 @@ class AddItemDialog:
             if date:
                 date_of_purchase = date
 
-        # Handle investment items (stocks/bonds)
-        conn = sqlite3.connect(self.db.db_name)
-        cursor = conn.cursor()
+        # Use the Database class methods to insert items properly
+        now = datetime.now().isoformat()
         
         if category in ['Stocks', 'Bonds']:
             # Validate required fields for investments
             if not date:
                 messagebox.showerror("Error", "Date is required for investments.")
-                conn.close()
                 return
             if not amount:
                 messagebox.showerror("Error", "Number of shares/units is required for investments.")
-                conn.close()
                 return
             if not price:
                 messagebox.showerror("Error", "Price per share/unit is required for investments.")
-                conn.close()
                 return
             
             try:
@@ -889,51 +919,31 @@ class AddItemDialog:
                 price = float(price)
             except ValueError:
                 messagebox.showerror("Error", "Amount and Price must be valid numbers.")
-                conn.close()
                 return
             
-            # Check if item with same name and category already exists
-            cursor.execute('''
-            SELECT id FROM items WHERE name = ? AND category = ?
-            ''', (name, category))
-            existing_item = cursor.fetchone()
+            # Check if investment with same name and category already exists
+            existing_items = self.db.get_items_by_category(category)
+            existing_item = next((item for item in existing_items if item[1] == name), None)
             
             if existing_item:
                 # Add purchase to existing item
                 item_id = existing_item[0]
-                cursor.execute('''
-                INSERT INTO purchases (item_id, date, amount, price) VALUES (?, ?, ?, ?)
-                ''', (item_id, date, amount, price))
+                self.db.add_purchase(item_id, type('Purchase', (), {'date': date, 'amount': amount, 'price': price})())
                 print(f"DEBUG: Added purchase to existing item - Item ID: {item_id}, Date: {date}, Amount: {amount}, Price: {price}")
                 
                 # Update the item's date to the most recent purchase date
-                cursor.execute('''
-                UPDATE items SET date_of_purchase = ?, updated_at = ? WHERE id = ?
-                ''', (date, datetime.now().isoformat(), item_id))
+                self.db.update_base_item(item_id, name, 0, date, 0, 0, category, now)
             else:
-                # Create new item
-                now = datetime.now().isoformat()
-                cursor.execute('''
-                INSERT INTO items (name, purchase_price, date_of_purchase, current_value, profit_loss, category, created_at, updated_at)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-                ''', (name, purchase_price, date_of_purchase, current_value, profit_loss, category, now, now))
-                item_id = cursor.lastrowid
+                # Create new investment item
+                item_id = self.db.insert_base_item(name, purchase_price, date_of_purchase, current_value, profit_loss, category, now, now)
                 
                 # Add purchase record
-                cursor.execute('''
-                INSERT INTO purchases (item_id, date, amount, price) VALUES (?, ?, ?, ?)
-                ''', (item_id, date, amount, price))
-                print(f"DEBUG: Created new item with purchase - Item ID: {item_id}, Date: {date}, Amount: {amount}, Price: {price}")
+                self.db.add_purchase(item_id, type('Purchase', (), {'date': date, 'amount': amount, 'price': price})())
+                print(f"DEBUG: Created new investment item with purchase - Item ID: {item_id}, Date: {date}, Amount: {amount}, Price: {price}")
         else:
-            # For non-investment items, always create new item
-            now = datetime.now().isoformat()
-            cursor.execute('''
-            INSERT INTO items (name, purchase_price, date_of_purchase, current_value, profit_loss, category, created_at, updated_at)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-            ''', (name, purchase_price, date_of_purchase, current_value, profit_loss, category, now, now))
-
-        conn.commit()
-        conn.close()
+            # For non-investment items (inventory and expenses), always create new item
+            item_id = self.db.insert_base_item(name, purchase_price, date_of_purchase, current_value, profit_loss, category, now, now)
+            print(f"DEBUG: Created new {category.lower()} item - Item ID: {item_id}, Name: {name}, Amount: {purchase_price}")
         self.top.destroy()
         self.on_success()
 
