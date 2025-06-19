@@ -27,9 +27,14 @@ A sophisticated Python-based personal finance management application that helps 
 - **Purchase History**: Detailed transaction tracking with table-specific context
 - **Export/Import**: CSV export functionality for data portability
 - **Data Integrity**: Comprehensive validation and error handling
+- **🔒 Database Protection**: Automatic protection against accidental deletion with read-only permissions
+- **📦 Automatic Backups**: Every 6 hours + event-driven backups with configurable retention
+- **🚨 Emergency Recovery**: Multiple confirmation layers and safety backups for restoration
 
 ### 🛡️ Quality Assurance
 - **33 Comprehensive Tests**: Complete test coverage for critical functionality
+- **Database Protection Framework**: Comprehensive safeguards against accidental data loss
+- **Automatic Backup System**: Time-based and event-driven backups with integrity verification
 - **Error Handling**: Graceful degradation for database and network issues
 - **Data Validation**: Input validation to prevent data corruption
 - **Performance Testing**: Verified with large portfolios (50+ items, 20+ purchases per item)
@@ -65,6 +70,24 @@ pip install -r requirements.txt
 # Run from source
 python main.py
 ```
+
+### 🔒 Database Protection (Automatic)
+Your database is automatically protected against accidental deletion:
+
+```bash
+# Check protection status
+python main.py --check-protection
+python scripts/protect_database.py status
+
+# Create manual backup before important changes
+python scripts/protect_database.py backup --name "before_important_change"
+
+# Emergency recovery (if needed)
+python scripts/protect_database.py list-backups
+python scripts/protect_database.py restore backup_name --confirm
+```
+
+**Note**: The protection framework runs automatically - no manual setup required! See [PROTECTION_QUICK_START.md](PROTECTION_QUICK_START.md) for details.
 
 ## 📋 Usage Guide
 
@@ -108,18 +131,26 @@ personal_finance/
 ├── config/                # Configuration management
 │   └── settings.py        # Application settings
 ├── utils/                 # Utility functions
-│   └── logging.py         # Logging configuration
+│   ├── logging.py         # Logging configuration
+│   └── database_protection.py  # Database protection framework
+├── scripts/               # Command-line utilities
+│   └── protect_database.py     # Database protection CLI
 ├── tests/                 # Comprehensive test suite
 │   ├── test_app_critical.py      # Critical functionality tests
 │   ├── test_database.py          # Database operation tests
 │   ├── test_models.py             # Data model tests
 │   └── TEST_COVERAGE_SUMMARY.md  # Test documentation
 ├── docs/                  # Documentation and ADRs
-│   └── adr/              # Architectural Decision Records
+│   ├── adr/              # Architectural Decision Records
+│   └── DATABASE_PROTECTION.md   # Protection framework docs
+├── backups/               # Automatic database backups
+├── archive/               # Historical backup storage
 ├── main.py               # Application entry point and core logic
 ├── gui.py                # Complete GUI application (1,600+ lines)
 ├── database.py           # Legacy database operations
-└── config.json           # Runtime configuration
+├── config.json           # Runtime configuration
+├── database_protection.json    # Protection framework config
+└── PROTECTION_QUICK_START.md   # Protection quick reference
 ```
 
 ### Database Schema
@@ -202,8 +233,10 @@ For detailed test coverage information, see `tests/TEST_COVERAGE_SUMMARY.md`.
 
 #### Database Issues
 - **Database locked**: Close all instances of the application
-- **Corrupt database**: Check backups in the `backups/` directory
+- **Corrupt database**: Check backups in the `backups/` directory with `python scripts/protect_database.py list-backups`
 - **Missing data**: Verify the correct database file is being used
+- **Database protection errors**: Check `python scripts/protect_database.py status`
+- **Accidental deletion**: Restore from automatic backups with `python scripts/protect_database.py restore backup_name --confirm`
 
 #### Installation Issues
 - **Module not found**: Ensure virtual environment is activated
@@ -256,8 +289,12 @@ flake8 .
 - [ADR 001: Flexible Item Model](docs/adr/001-flexible-item-model.md)
 - [ADR 002: Database Schema](docs/adr/002-database-schema.md)
 - [ADR 003: GUI Design](docs/adr/003-gui-design.md)
+- [ADR 004: Testing Architecture](docs/adr/004-testing-architecture.md)
+- [ADR 005: Database Protection Framework](docs/adr/005-database-protection-framework.md)
 
 ### Additional Resources
+- `docs/DATABASE_PROTECTION.md`: Complete database protection framework documentation
+- `PROTECTION_QUICK_START.md`: Essential database protection commands
 - `tests/TEST_COVERAGE_SUMMARY.md`: Comprehensive test documentation
 - `DATABASE_MIGRATION.md`: Database migration guide (if applicable)
 - `CHANGELOG.md`: Version history and updates
