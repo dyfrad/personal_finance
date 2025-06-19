@@ -4,7 +4,7 @@
 Accepted
 
 ## Context
-The personal finance application needs a robust database schema that can handle:
+The Personal Finance Manager application needs a robust database schema that can handle:
 1. **Multiple Item Categories**: Investments, inventory items, and expenses with different data requirements
 2. **Purchase Tracking**: Multiple purchases per item with detailed transaction history
 3. **Table Separation**: Logical separation of different item types while maintaining consistency

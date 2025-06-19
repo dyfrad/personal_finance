@@ -61,7 +61,7 @@ source venv/bin/activate  # On Windows: venv\Scripts\activate
 pip install -e .
 
 # Run the application
-personal_finance
+personal-finance-manager
 ```
 
 ### Alternative Installation

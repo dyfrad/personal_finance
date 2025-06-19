@@ -2,7 +2,11 @@ import sqlite3
 from datetime import datetime
 
 class Database:
-    """Database management class for the personal finance application.
+    """
+    Database management class for the Personal Finance Manager application.
+
+    This module provides a comprehensive database interface for managing
+    financial items including investments, inventory, and expenses.
     
     Handles all database operations including creating tables, inserting/updating/deleting
     items and purchases, and retrieving data. Uses SQLite as the backend database.

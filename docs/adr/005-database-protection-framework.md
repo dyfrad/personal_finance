@@ -4,7 +4,7 @@
 Accepted
 
 ## Context
-Personal finance applications handle critical financial data that users cannot afford to lose. Common risks include:
+Personal Finance Manager applications handle critical financial data that users cannot afford to lose. Common risks include:
 
 1. **Accidental Deletion**: User accidentally deletes database file or runs destructive operations
 2. **Data Corruption**: Hardware failures, power outages, or software bugs corrupt the database

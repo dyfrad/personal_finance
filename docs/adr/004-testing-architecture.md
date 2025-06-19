@@ -4,7 +4,7 @@
 Accepted
 
 ## Context
-The personal finance application handles sensitive financial data and complex calculations that require high reliability. Users depend on accurate portfolio tracking, and system failures could result in data loss or incorrect financial information. A comprehensive testing strategy is essential to ensure:
+The Personal Finance Manager application handles sensitive financial data and complex calculations that require high reliability. Users depend on accurate portfolio tracking, and system failures could result in data loss or incorrect financial decisions. A comprehensive testing strategy is essential to ensure:
 
 1. **Data Integrity**: All financial calculations are accurate
 2. **System Reliability**: The application handles errors gracefully without crashing

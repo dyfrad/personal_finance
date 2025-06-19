@@ -1,7 +1,7 @@
 # Test Coverage Summary
 
 ## Overview
-This document provides a comprehensive overview of the test coverage for the Personal Finance Application. The test suite consists of **33 focused tests** across three main categories, ensuring robust functionality and data integrity.
+This document provides a comprehensive overview of the test coverage for the Personal Finance Manager application. The test suite consists of **33 focused tests** across three main categories, ensuring robust functionality and data integrity.
 
 ## Test Categories
 
@@ -126,7 +126,7 @@ Tests are designed to run quickly and reliably in CI/CD environments:
 
 ## Conclusion
 
-The test suite provides comprehensive coverage of the Personal Finance Application's core functionality. With 33 focused tests achieving 100% pass rate, the application demonstrates:
+The test suite provides comprehensive coverage of the Personal Finance Manager application's core functionality. With 33 focused tests achieving 100% pass rate, the application demonstrates:
 
 - **Reliability**: Consistent behavior across all operations
 - **Accuracy**: Correct financial calculations and data management

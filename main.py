@@ -1,11 +1,10 @@
 #!/usr/bin/env python3
 """
-Personal Finance Application
+Personal Finance Manager
 
-A comprehensive personal finance management application built with Python and Tkinter.
-Features portfolio management, advanced analytics, modern UI, and data management capabilities.
+A sophisticated Python-based personal finance management application that helps you track and manage your financial portfolio with advanced features for investments, inventory, and expenses.
 
-Author: Your Name
+Author: Mohit Saharan
 Version: 0.2.0
 """
 
@@ -221,7 +220,7 @@ def init_application():
     # Setup logging
     setup_logging(config_manager)
     logger = get_logger(__name__)
-    logger.info("Starting Personal Finance Application v0.2.0")
+    logger.info("Starting Personal Finance Manager v0.2.0")
     
     # Initialize database protection
     if PROTECTION_AVAILABLE:
@@ -254,7 +253,7 @@ def init_application():
 def main():
     """Main application entry point."""
     parser = argparse.ArgumentParser(
-        description="Personal Finance Application",
+        description="Personal Finance Manager",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:

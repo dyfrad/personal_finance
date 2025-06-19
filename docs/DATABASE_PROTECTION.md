@@ -2,7 +2,7 @@
 
 ## Overview
 
-The Database Protection Framework provides comprehensive safeguards against accidental deletion, corruption, or data loss in your personal finance application. It implements multiple layers of protection including automatic backups, file permissions, integrity checks, and safe operation contexts.
+The Database Protection Framework provides comprehensive safeguards against accidental deletion, corruption, or data loss in your Personal Finance Manager application. It implements multiple layers of protection including automatic backups, file permissions, integrity checks, and safe operation contexts.
 
 ## Features
 

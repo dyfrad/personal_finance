@@ -7,14 +7,14 @@ with open("requirements.txt", "r", encoding="utf-8") as fh:
     requirements = fh.read().splitlines()
 
 setup(
-    name="personal_finance",
-    version="1.0.0",
-    author="Your Name",
-    author_email="your.email@example.com",
-    description="A personal finance management application",
+    name="personal-finance-manager",
+    version="0.2.0",
+    author="Mohit Saharan",
+    author_email="mohit@msaharan.com",
+    description="A sophisticated Python-based personal finance management application that helps you track and manage your financial portfolio with advanced features for investments, inventory, and expenses.",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/yourusername/personal_finance",
+    url="https://github.com/msaharan/personal_finance",
     packages=find_packages(),
     classifiers=[
         "Development Status :: 4 - Beta",
@@ -30,7 +30,7 @@ setup(
     install_requires=requirements,
     entry_points={
         "console_scripts": [
-            "personal_finance=main:main",
+            "personal-finance-manager=main:main",
         ],
     },
 ) 

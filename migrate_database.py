@@ -24,11 +24,11 @@ def check_migration_needed():
         return False
 
 def main():
-    """Run the database migration."""
+    """Main migration function."""
+    print("=== Personal Finance Manager Database Migration ===")
     auto_mode = '--auto' in sys.argv
     check_only = '--check' in sys.argv
     
-    print("=== Personal Finance Database Migration ===")
     print("Moving items from 'items' table to category-specific tables...")
     
     # Check if migration is needed
