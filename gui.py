@@ -4,6 +4,8 @@ from main import Item, save_portfolio, load_portfolio
 from database import Database
 import pandas as pd
 from datetime import datetime, timedelta
+import matplotlib
+matplotlib.use('TkAgg')  # Ensure TkAgg backend is used
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import numpy as np
@@ -264,49 +266,66 @@ class PerformanceGraphDialog:
         comparison_items (list): List of items selected for comparison
     """
     def __init__(self, top_level_root, parent_for_modality, item_data, db):
-        self.top = top_level_root # Use the Toplevel provided by show_window
-        set_theme(self.top, light_mode=True) # Apply light theme
-        
-        self.top.title(f"Performance Graph - {item_data.name}")
-        self.top.geometry("1000x800")
-        
-        # Store database reference and item data
-        self.db = db
-        self.item_data = item_data
-        self.comparison_items = []
-        
-        # Make it modal
-        self.top.transient(parent_for_modality) # parent_for_modality is PersonalFinanceApp's root
-        self.top.grab_set()
-        
-        # Center the window
-        self.top.update_idletasks()
-        width = self.top.winfo_width()
-        height = self.top.winfo_height()
-        x = (self.top.winfo_screenwidth() // 2) - (width // 2)
-        y = (self.top.winfo_screenheight() // 2) - (height // 2)
-        self.top.geometry(f'{width}x{height}+{x}+{y}')
-        
-        # Create main container
-        main_container = ttk.Frame(self.top)
-        main_container.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
-        
-        # Create control panel
-        self.create_control_panel(main_container)
-        
-        # Create figure and axis
-        self.fig, (self.ax1, self.ax2) = plt.subplots(2, 1, figsize=(12, 8), height_ratios=[3, 1])
-        
-        # Create canvas
-        self.canvas = FigureCanvasTkAgg(self.fig, master=main_container)
-        self.canvas.draw()
-        self.canvas.get_tk_widget().pack(fill=tk.BOTH, expand=True)
-        
-        # Add close button
-        ttk.Button(main_container, text="Close", command=self.top.destroy).pack(pady=10)
-        
-        # Initial plot
-        self.update_graph()
+        try:
+            print(f"Initializing PerformanceGraphDialog for {item_data.name}")
+            self.top = top_level_root # Use the Toplevel provided by show_window
+            set_theme(self.top, light_mode=True) # Apply light theme
+            
+            self.top.title(f"Performance Graph - {item_data.name}")
+            self.top.geometry("1000x800")
+            
+            # Store database reference and item data
+            self.db = db
+            self.item_data = item_data
+            self.comparison_items = []
+            
+            # Make it modal
+            self.top.transient(parent_for_modality) # parent_for_modality is PersonalFinanceApp's root
+            self.top.grab_set()
+            
+            # Center the window
+            self.top.update_idletasks()
+            width = self.top.winfo_width()
+            height = self.top.winfo_height()
+            x = (self.top.winfo_screenwidth() // 2) - (width // 2)
+            y = (self.top.winfo_screenheight() // 2) - (height // 2)
+            self.top.geometry(f'{width}x{height}+{x}+{y}')
+            
+            # Create main container
+            main_container = ttk.Frame(self.top)
+            main_container.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
+            
+            print("Creating control panel...")
+            # Create control panel
+            self.create_control_panel(main_container)
+            
+            print("Creating matplotlib figure...")
+            # Create figure and axis with white background
+            self.fig, (self.ax1, self.ax2) = plt.subplots(2, 1, figsize=(12, 8), height_ratios=[3, 1], facecolor='white')
+            self.fig.patch.set_facecolor('white')
+            
+            print("Creating canvas...")
+            # Create canvas
+            self.canvas = FigureCanvasTkAgg(self.fig, master=main_container)
+            canvas_widget = self.canvas.get_tk_widget()
+            canvas_widget.configure(bg='white')
+            canvas_widget.pack(fill=tk.BOTH, expand=True)
+            
+            # Force initial draw
+            self.canvas.draw_idle()
+            
+            # Add close button
+            ttk.Button(main_container, text="Close", command=self.top.destroy).pack(pady=10)
+            
+            print("Updating graph...")
+            # Initial plot
+            self.update_graph()
+            print("PerformanceGraphDialog initialization complete")
+            
+        except Exception as e:
+            print(f"Error initializing PerformanceGraphDialog: {e}")
+            messagebox.showerror("Error", f"Error initializing performance graph: {str(e)}")
+            self.top.destroy()
         
     def create_control_panel(self, parent):
         """Create the control panel for the performance graph.
@@ -455,15 +474,20 @@ class PerformanceGraphDialog:
     def update_graph(self):
         """Update the performance graph with current data and settings."""
         try:
+            print(f"Starting update_graph for {self.item_data.name}")
             # Clear previous plots
             self.ax1.clear()
             self.ax2.clear()
             
             # Get data for main item
+            print(f"Getting historical data for period: {self.period_var.get()}")
             data = self.get_historical_data(self.item_data, self.period_var.get())
+            print(f"Data retrieved, shape: {data.shape}")
             
             # Plot main item
+            print(f"Plotting main item data with {len(data)} data points")
             self.ax1.plot(data.index, data['Close'], label=self.item_data.name, linewidth=2)
+            print(f"Main plot added")
             
             # Auto-scale y-axis based on price data
             min_price = data['Close'].min()
@@ -513,13 +537,16 @@ class PerformanceGraphDialog:
                     self.ax2.legend()
             
             # Rotate x-axis labels
-            plt.xticks(rotation=45)
+            plt.setp(self.ax1.xaxis.get_majorticklabels(), rotation=45)
             
             # Adjust layout
-            plt.tight_layout()
+            self.fig.tight_layout()
             
             # Redraw canvas
+            print("Drawing canvas...")
             self.canvas.draw()
+            self.canvas.flush_events()
+            print("Canvas drawn successfully")
             
             # Mark all purchases on the graph
             if hasattr(self.item_data, 'purchases') and self.item_data.purchases:
@@ -553,7 +580,9 @@ class PerformanceGraphDialog:
                         sel.annotation.get_bbox_patch().set(fc="white")
             
         except Exception as e:
+            import traceback
             print(f"Error updating graph: {e}")
+            print(f"Traceback: {traceback.format_exc()}")
             messagebox.showerror("Error", f"Error updating graph: {str(e)}")
 
 class TechnicalIndicators:
@@ -1304,6 +1333,34 @@ class PersonalFinanceApp:
         # Track open windows specific to PersonalFinanceApp
         self.open_windows = {}
 
+    def show_window(self, window_type, window_class, *args, **kwargs):
+        """Show a new window of the specified type.
+        
+        Args:
+            window_type (str): Type of window to show
+            window_class (class): Class of the window to instantiate
+            *args: Additional positional arguments for window initialization
+            **kwargs: Additional keyword arguments for window initialization
+        """
+        # Get the actual Toplevel window from the stored object if it exists
+        top_level_window = self.open_windows.get(window_type)
+
+        if top_level_window and top_level_window.winfo_exists():
+            # Window exists, focus it
+            top_level_window.lift()
+            top_level_window.focus_force()
+        else:
+            # Create new window
+            new_toplevel = tk.Toplevel(self.root)
+            # Pass the new Toplevel window as the first argument to the window_class
+            window_instance = window_class(new_toplevel, self.root, *args, **kwargs)
+
+            # Store the Toplevel window itself, not the dialog class instance
+            self.open_windows[window_type] = new_toplevel 
+            
+            # Set the protocol for closing the Toplevel window
+            new_toplevel.protocol("WM_DELETE_WINDOW", lambda: self.on_window_close(window_type))
+
     def create_right_panel(self, parent):
         """Create the right panel with action buttons.
         
@@ -1475,8 +1532,8 @@ class PersonalFinanceApp:
         if item_to_show_performance and item_to_show_performance.category in ['Stocks', 'Bonds']:
             # Create a unique key for this performance window
             window_key = f'performance_{selected_item_id}'
-            # Use the new show_window method
-            self.show_window(window_key, PerformanceGraphDialog, self.root, item_to_show_performance, self.db)
+            # Use the new show_window method - don't pass self.root as extra arg
+            self.show_window(window_key, PerformanceGraphDialog, item_to_show_performance, self.db)
         else:
             CustomMessageBox(self.root, "Info", "Performance graph is only available for Stocks and Bonds.", type="info")
 
@@ -1491,8 +1548,8 @@ class PersonalFinanceApp:
         if item_to_view_purchases and item_to_view_purchases.category in ['Stocks', 'Bonds']:
             # Create a unique key for this purchases window
             window_key = f'purchases_{selected_item_id}'
-            # Use the new show_window method
-            self.show_window(window_key, PurchasesDialog, self.root, self.db, item_to_view_purchases.id, item_to_view_purchases.name)
+            # Use the new show_window method - don't pass self.root as extra arg
+            self.show_window(window_key, PurchasesDialog, self.db, item_to_view_purchases.id, item_to_view_purchases.name)
             self.load_portfolio_gui() # Refresh display after purchases are added/modified
         else:
             CustomMessageBox(self.root, "Info", "Purchase details are only available for Stocks and Bonds.", type="info")
@@ -1503,7 +1560,7 @@ class PersonalFinanceApp:
         Args:
             window_key (str): Key of the window being closed
         """
-        if hasattr(self, 'open_windows') and window_key in self.open_windows:
+        if window_key in self.open_windows:
             self.open_windows[window_key].destroy()
             del self.open_windows[window_key]
 
