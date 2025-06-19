@@ -382,7 +382,7 @@ class PerformanceGraphDialog:
             item = Item(name, category, purchase_price, date_of_purchase, current_value, profit_loss)
             item.id = item_id
             if category in ['Stocks', 'Bonds']:
-                purchases_data = self.db.get_purchases_for_item(item_id)
+                purchases_data = self.db.get_purchases_for_item(item_id, 'investments')
                 for p_date, p_amount, p_price in purchases_data:
                     item.add_purchase(Purchase(p_date, p_amount, p_price))
             all_items.append(item)
@@ -677,7 +677,12 @@ class PurchasesDialog:
         set_theme(self.top, light_mode=True) # Apply light theme
         self.top.title(f"Purchases for {item_name}")
         self.top.geometry("500x400")
-        self.purchases = self.db.get_purchases_for_item(item_id)
+        # Determine table name based on category
+        if self.item_category in ['Stocks', 'Bonds', 'Crypto', 'Real Estate', 'Gold']:
+            table_name = 'investments'
+        else:
+            table_name = 'inventory'
+        self.purchases = self.db.get_purchases_for_item(item_id, table_name)
 
         # Make it modal
         self.top.transient(parent_for_modality) # parent_for_modality is PersonalFinanceApp's root
@@ -749,8 +754,13 @@ class PurchasesDialog:
         if not date:
             messagebox.showerror("Error", "Date is required.")
             return
-        self.db.add_purchase(self.item_id, type('Purchase', (), {'date': date, 'amount': amount, 'price': price})())
-        self.purchases = self.db.get_purchases_for_item(self.item_id)
+        # Determine table name based on category
+        if self.item_category in ['Stocks', 'Bonds', 'Crypto', 'Real Estate', 'Gold']:
+            table_name = 'investments'
+        else:
+            table_name = 'inventory'
+        self.db.add_purchase(self.item_id, type('Purchase', (), {'date': date, 'amount': amount, 'price': price})(), table_name)
+        self.purchases = self.db.get_purchases_for_item(self.item_id, table_name)
         self.refresh_tree()
         self.date_entry.delete(0, tk.END)
         self.amount_entry.delete(0, tk.END)
