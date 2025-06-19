@@ -711,7 +711,8 @@ class AddItemDialog:
         self.on_success = on_success
         self.category = category
         
-        self.top = tk.Toplevel(top_level_root)
+        self.top = top_level_root  # Use the Toplevel provided by show_window
+        set_theme(self.top, light_mode=True)  # Apply light theme
         self.top.title("Add New Item")
         self.top.geometry("400x500")
         self.top.transient(parent_for_modality)
@@ -749,6 +750,10 @@ class AddItemDialog:
         self.date_entry.insert(0, datetime.now().strftime("%Y-%m-%d"))
         self.date_entry.pack(pady=5, fill=tk.X, padx=20)
         
+        ttk.Label(self.top, text="Amount/Quantity:").pack(pady=5)
+        self.amount_entry = ttk.Entry(self.top)
+        self.amount_entry.pack(pady=5, fill=tk.X, padx=20)
+        
         ttk.Label(self.top, text="Current Value (€):").pack(pady=5)
         self.value_entry = ttk.Entry(self.top)
         self.value_entry.pack(pady=5, fill=tk.X, padx=20)
@@ -780,14 +785,14 @@ class AddItemDialog:
 
         # For non-stock items, use the entered values if provided
         if category not in ['Stocks', 'Bonds']:
-            if date and amount and price:  # Only use values if all fields are provided
+            if date and price:  # Only date and price needed for non-stock items
                 try:
                     purchase_price = float(price)
-                    current_value = float(price)  # Initially set current value same as purchase price
+                    current_value = float(self.value_entry.get()) if self.value_entry.get().strip() else purchase_price
                     date_of_purchase = date
                     profit_loss = current_value - purchase_price
                 except ValueError:
-                    messagebox.showerror("Error", "Amount and Price must be numbers.")
+                    messagebox.showerror("Error", "Price and Current Value must be numbers.")
                     return
 
         # Insert item
@@ -1173,8 +1178,10 @@ class MainDashboard:
         Args:
             category (str, optional): Category of item to add. Defaults to None.
         """
+        # Create unique window type based on category to prevent window conflicts
+        window_type = f'add_item_{category}' if category else 'add_item'
         # Pass MainDashboard's root as the parent_for_modality
-        self.show_window('add_item', AddItemDialog, self.root, self.db, self.refresh_dashboard, category)
+        self.show_window(window_type, AddItemDialog, self.root, self.db, self.refresh_dashboard, category)
 
     def refresh_dashboard(self):
         """Refresh all dashboard components."""
