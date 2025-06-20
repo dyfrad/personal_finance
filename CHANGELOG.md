@@ -4,6 +4,31 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/en/2.0.0/).
 
+## [0.2.2] - 2025-06-20
+### Changed
+- **GUI Architecture**: Refactored GUI initialization for better MainDashboard architecture
+  - Replaced PersonalFinanceApp with MainDashboard class for improved separation of concerns
+  - Added explicit tkinter root and Database initialization for better lifecycle management
+  - Improved application close handling with proper cleanup and protection reapplication
+  - Maintained backward compatibility with database protection framework
+
+### Documentation
+- **Documentation Structure**: Created specialized documentation architecture for better organization
+  - Created DEVELOPMENT.md (88 lines) for version management, testing, and development workflow
+  - Created ARCHITECTURE.md (83 lines) for technical design details and project structure
+  - Created CONFIGURATION.md (117 lines) for settings, environment variables, and configuration
+  - Created TROUBLESHOOTING.md (154 lines) for comprehensive problem solving and recovery procedures
+- **README Streamlining**: Improved user experience with focused content
+  - Reduced README from 410 to 149 lines (63% reduction) for better user focus
+  - Moved technical details to specialized documentation files
+  - Improved navigation with clear links to detailed guides
+  - Enhanced installation and usage instructions clarity
+  - Separated developer and user-focused information for better experience
+
+### Internal
+- **Code Organization**: Better separation of concerns in main application entry point
+- **Documentation Maintenance**: Enhanced documentation organization for long-term maintainability
+- **User Experience**: Significantly improved documentation structure and accessibility
 ## [0.2.1] - 2025-06-20
 ### Added
 - **GNU Affero General Public License v3.0 (AGPL-3.0)**: Complete license implementation

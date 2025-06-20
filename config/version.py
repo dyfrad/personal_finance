@@ -5,7 +5,7 @@ This module centralizes version information to avoid duplication
 across setup.py, main.py, and other files.
 """
 
-__version__ = "0.2.1"
+__version__ = "0.2.2"
 __app_name__ = "Personal Finance Manager"
 __author__ = "Mohit Saharan"
 __author_email__ = "mohit@msaharan.com"
