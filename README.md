@@ -1,17 +1,11 @@
 # Personal Finance Manager
 
-A sophisticated Python-based personal finance management application that helps you track and manage your financial portfolio with advanced features for investments, inventory, and expenses.
-
-A sophisticated personal finance application designed for individual use with local data storage and privacy protection.
+A sophisticated Python-based personal finance management application that helps you track and manage your financial portfolio with advanced features for investments, inventory, and expenses. Designed for individual use with local data storage and privacy protection.
 
 ## Application Overview
 ![Personal Finance Manager Dashboard](docs/images/dashboard_0.2.0.png)
 
-The dashboard provides a comprehensive view of your financial portfolio with:
-- Real-time stock performance tracking with technical indicators
-- Expense monitoring with detailed visualization
-- Quick access controls for portfolio management
-- Reserved space for future feature expansion
+The dashboard provides a comprehensive view of your financial portfolio with real-time stock performance tracking, expense monitoring, and portfolio management controls.
 
 ## Key Features
 
@@ -42,7 +36,7 @@ The dashboard provides a comprehensive view of your financial portfolio with:
 ## Quick Start
 
 ### Prerequisites
-- Python 3.7 or higher
+- Python 3.8 or higher
 - pip package manager
 
 ### Installation
@@ -67,13 +61,13 @@ personal-finance-manager
 # Install dependencies
 pip install -r requirements.txt
 
-# Run the application (choose one):
+# Run the application
 python main.py              # Full version with database protection
 python main.py --help       # See all available options
 python gui.py               # Simple GUI only (for testing)
 ```
 
-## Basic Usage
+## Usage
 
 ### Getting Started
 1. **Launch**: Run `personal-finance-manager` or `python main.py`
@@ -88,21 +82,14 @@ python gui.py               # Simple GUI only (for testing)
 - **Expenses**: Simplified forms with amount and date
 - **Export**: CSV export for data portability
 
-### Key Features
-- **Technical Analysis**: RSI, MACD, moving averages for stock performance
-- **Theme Switching**: Toggle between light and dark modes
-- **Real-time Updates**: Live stock data integration (when available)
-- **Data Export**: Export portfolio data to CSV format
-
-## Database Protection
-
-Your database is automatically protected:
+### Database Protection
+Your database is automatically protected with:
 - **Automatic backups** every 6 hours
 - **Protection status**: `python main.py --check-protection`
 - **Manual backup**: `python scripts/protect_database.py backup --name "my_backup"`
 - **Emergency recovery**: Available if needed
 
-See [PROTECTION_QUICK_START.md](PROTECTION_QUICK_START.md) for details.
+See [PROTECTION_QUICK_START.md](PROTECTION_QUICK_START.md) for detailed protection commands.
 
 ## Documentation
 
@@ -116,7 +103,6 @@ See [PROTECTION_QUICK_START.md](PROTECTION_QUICK_START.md) for details.
 - **[Changelog](CHANGELOG.md)**: Version history and updates
 
 ### Additional Resources
-- `PROTECTION_QUICK_START.md`: Database protection commands
 - `docs/`: Architectural Decision Records and detailed documentation
 - `tests/`: Comprehensive test suite (33 tests, 100% passing)
 
