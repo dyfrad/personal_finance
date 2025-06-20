@@ -359,6 +359,29 @@ __description__ = "A sophisticated Python-based..."  # App description
 - `CHANGELOG.md`: Version history and updates
 - `scripts/update_version.py`: Version management utility for automated version updates
 
+## License
+
+This project is licensed under the **GNU Affero General Public License v3.0 (AGPL-3.0)**.
+
+### License Summary
+- **Freedom to Use**: You can use this software for any purpose
+- **Freedom to Study**: You can examine the source code and understand how it works
+- **Freedom to Modify**: You can modify the software to suit your needs
+- **Freedom to Share**: You can distribute copies of the original or modified software
+- **Network Use**: If you run a modified version on a server, you must provide the source code to users
+
+### Key Requirements
+- **Source Code Availability**: If you distribute this software, you must provide the complete source code
+- **Network Server Provision**: If you run a modified version on a network server, you must provide the source code to users who interact with it
+- **License Preservation**: Any modified versions must also be licensed under AGPL-3.0
+- **Copyright Notice**: You must preserve all copyright notices and license information
+
+### Full License Text
+The complete license text is available in the [LICENSE](LICENSE) file and online at [https://www.gnu.org/licenses/agpl-3.0.html](https://www.gnu.org/licenses/agpl-3.0.html).
+
+### Copyright
+Copyright (c) 2025 Mohit Saharan
+
 ## Acknowledgments
 
 - **[yfinance](https://github.com/ranaroussi/yfinance)**: Real-time stock data

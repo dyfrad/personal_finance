@@ -4,6 +4,27 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/en/2.0.0/).
 
+## [0.2.1] - 2025-06-20
+### Added
+- **GNU Affero General Public License v3.0 (AGPL-3.0)**: Complete license implementation
+  - Added comprehensive LICENSE file with full AGPL-3.0 text
+  - Updated all source files with proper license headers
+  - Added license information to setup.py and configuration files
+  - Created license information script for easy access to license details
+  - Updated README.md with detailed license section and requirements
+- **License Compliance**: Full compliance with AGPL-3.0 requirements
+  - Copyright notices on all source files
+  - License information in package metadata
+  - License headers following GNU standards
+  - License documentation and user guidance
+
+### Documentation
+- **License Documentation**: Comprehensive license information
+  - Detailed license summary in README.md
+  - License requirements and user rights explanation
+  - Copyright notice and attribution
+  - Links to full license text and official sources
+
 ## [0.2.0] - 2025-06-19
 ### Added
 - **Comprehensive Testing Architecture**: 33 focused tests covering critical functionality

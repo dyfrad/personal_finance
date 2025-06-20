@@ -1,0 +1,29 @@
+"""
+[Module Name]
+
+[Brief description of the module's purpose and functionality]
+
+Copyright (c) 2025 Mohit Saharan
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with this program.  If not, see <https://www.gnu.org/licenses/>.
+"""
+
+# [Your imports and code here]
+
+# Usage Instructions:
+# 1. Replace [Module Name] with the actual module name
+# 2. Replace [Brief description...] with a concise description of what the module does
+# 3. Keep the copyright notice and license text exactly as shown
+# 4. Add your imports and code after the license header
+# 5. Ensure the module docstring follows Python conventions 

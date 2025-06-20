@@ -26,6 +26,7 @@ setup(
     long_description=long_description,
     long_description_content_type="text/markdown",
     url=__github_url__,
+    license="GNU Affero General Public License v3.0",
     packages=find_packages(),
     classifiers=[
         "Development Status :: 4 - Beta",
@@ -36,6 +37,7 @@ setup(
         "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: 3.10",
         "Operating System :: OS Independent",
+        "License :: OSI Approved :: GNU Affero General Public License v3",
     ],
     python_requires=">=3.8",
     install_requires=requirements,
