@@ -4,6 +4,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/en/2.0.0/).
 
+[Unreleased]: https://github.com/msaharan/dyfrad/compare/v0.2.0...HEAD
+[0.2.2]: https://github.com/msaharan/dyfrad/compare/v0.2.1...v0.2.2
+[0.2.1]: https://github.com/msaharan/dyfrad/compare/v0.2.0...v0.2.1
+[0.2.0]: https://github.com/msaharan/dyfrad/compare/v0.1.0...v0.2.0
+[0.1.0]: https://github.com/msaharan/dyfrad/releases/tag/v0.1.0 
+
+## [0.2.3] - date
+### Documentation
+- **Documentation Accessibility**: Removed private project restrictions to enable potential collaboration
+  - Removed PRIVATE PROJECT banner from README for broader accessibility
+  - Updated installation instructions to use generic repository URL format
+  - Softened private project language while maintaining privacy and security focus
+  - Removed private project references from license documentation
+  - Maintained security principles while enabling potential collaboration opportunities
+
 ## [0.2.2] - 2025-06-20
 ### Changed
 - **GUI Architecture**: Refactored GUI initialization for better MainDashboard architecture
@@ -29,6 +44,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/en/2.0.0/).
 - **Code Organization**: Better separation of concerns in main application entry point
 - **Documentation Maintenance**: Enhanced documentation organization for long-term maintainability
 - **User Experience**: Significantly improved documentation structure and accessibility
+
 ## [0.2.1] - 2025-06-20
 ### Added
 - **GNU Affero General Public License v3.0 (AGPL-3.0)**: Complete license implementation
@@ -204,17 +220,3 @@ and this project adheres to [Semantic Versioning](https://semver.org/en/2.0.0/).
 - Initial layout implementation for "Add Item" and "View Items" windows.
 - Basic theme consistency implementation.
 - Initial layout fixes for the "View Items" window.
-
-## [Upcoming]
-### Planned
-- GUI testing framework integration
-- Performance benchmarking and metrics
-- Enhanced security testing and input validation
-- Advanced reporting and analytics features
-- Data export/import in multiple formats
-- Mobile-responsive web interface
-- Real-time market data integration improvements
-
-[Unreleased]: https://github.com/msaharan/dyfrad/compare/v0.2.0...HEAD
-[0.2.0]: https://github.com/msaharan/dyfrad/compare/v0.1.0...v0.2.0
-[0.1.0]: https://github.com/msaharan/dyfrad/releases/tag/v0.1.0 
