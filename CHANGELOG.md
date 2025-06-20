@@ -4,13 +4,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/en/2.0.0/).
 
-[Unreleased]: https://github.com/msaharan/dyfrad/compare/v0.2.0...HEAD
+[Unreleased]: https://github.com/msaharan/dyfrad/compare/v0.2.3...HEAD
+[0.2.3]: https://github.com/msaharan/dyfrad/compare/v0.2.2...v0.2.3
 [0.2.2]: https://github.com/msaharan/dyfrad/compare/v0.2.1...v0.2.2
 [0.2.1]: https://github.com/msaharan/dyfrad/compare/v0.2.0...v0.2.1
 [0.2.0]: https://github.com/msaharan/dyfrad/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/msaharan/dyfrad/releases/tag/v0.1.0 
 
-## [0.2.3] - date
+## [0.2.3] - 2025-06-20
 ### Documentation
 - **Documentation Accessibility**: Removed private project restrictions to enable potential collaboration
   - Removed PRIVATE PROJECT banner from README for broader accessibility
@@ -18,6 +19,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/en/2.0.0/).
   - Softened private project language while maintaining privacy and security focus
   - Removed private project references from license documentation
   - Maintained security principles while enabling potential collaboration opportunities
+- **README Streamlining**: Improved user experience with focused content
+  - Consolidated application description and key features
+  - Removed repeated installation and usage instructions
+  - Centralized references to documentation and license
+  - Improved clarity and reduced length for better user focus
+
+### Changed
+- **Code Documentation**: Improved maintainability and consistency
+  - Removed hardcoded author and version from main.py docstring
+  - Centralized version information in config/version.py
+  - Improved code documentation consistency across the project
+
+### Internal
+- **Version Management**: Updated version to 0.2.3 to reflect documentation improvements
+- **Documentation Maintenance**: Enhanced documentation organization for better accessibility
+- **User Experience**: Significantly improved documentation structure and clarity
 
 ## [0.2.2] - 2025-06-20
 ### Changed
