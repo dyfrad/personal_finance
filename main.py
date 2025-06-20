@@ -353,7 +353,9 @@ Examples:
     
     # Start GUI application
     try:
-        from gui import PersonalFinanceApp
+        from gui import MainDashboard
+        from database import Database
+        import tkinter as tk
         
         logger = logging.getLogger(__name__)
         logger.info("Starting GUI application")
@@ -363,7 +365,9 @@ Examples:
             protection.unprotect_database()
         
         # Create and run the application
-        app = PersonalFinanceApp()
+        root = tk.Tk()
+        db = Database()
+        dashboard = MainDashboard(root, db)
         
         # Ensure protection is reapplied when app closes
         def on_app_close():
@@ -376,12 +380,13 @@ Examples:
                     logger.info("Database protection reapplied on shutdown")
                 except Exception as e:
                     logger.error(f"Failed to reapply protection on shutdown: {e}")
+            root.destroy()
         
         # Set up close handler
-        app.root.protocol("WM_DELETE_WINDOW", lambda: [on_app_close(), app.root.destroy()])
+        root.protocol("WM_DELETE_WINDOW", on_app_close)
         
         # Run the application
-        app.run()
+        root.mainloop()
         
     except ImportError as e:
         logger.error(f"Failed to import GUI module: {e}")
