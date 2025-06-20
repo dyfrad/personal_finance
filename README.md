@@ -2,7 +2,7 @@
 
 A sophisticated Python-based personal finance management application that helps you track and manage your financial portfolio with advanced features for investments, inventory, and expenses.
 
-**PRIVATE PROJECT**: This is a personal finance application designed for individual use. All data is stored locally and privately.
+A sophisticated personal finance application designed for individual use with local data storage and privacy protection.
 
 ## Application Overview
 ![Personal Finance Manager Dashboard](docs/images/dashboard_0.2.0.png)
@@ -47,8 +47,8 @@ The dashboard provides a comprehensive view of your financial portfolio with:
 
 ### Installation
 ```bash
-# Clone the repository (private)
-git clone <your-private-repo-url>
+# Clone the repository
+git clone <repository-url>
 cd personal_finance
 
 # Create and activate virtual environment
@@ -138,7 +138,7 @@ See [LICENSE](LICENSE) for complete details.
 
 ## Privacy & Security
 
-This is a **private personal finance application** designed for individual use:
+This is a **personal finance application** designed for individual use:
 - **Local Data Storage**: All financial data stored locally on your device
 - **No Cloud Services**: No data transmitted to external servers
 - **Privacy First**: Your financial information remains completely private

@@ -142,4 +142,4 @@ The license implementation can be verified by:
 
 ---
 
-**Note**: This implementation ensures full compliance with the GNU Affero General Public License v3.0 while maintaining the private nature of this personal finance application. The license protects user freedoms while ensuring source code availability for any distributed versions. 
+**Note**: This implementation ensures full compliance with the GNU Affero General Public License v3.0 for this personal finance application. The license protects user freedoms while ensuring source code availability for any distributed versions. 
