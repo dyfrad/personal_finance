@@ -130,9 +130,13 @@ source venv/bin/activate  # On Windows: venv\Scripts\activate
 pip install -e .
 
 # Run the application (choose one):
-personal-finance-manager    # Full version with database protection
-python main.py             # Full version with database protection and CLI options
-python gui.py              # Simple GUI only (no protection features)
+personal-finance-manager
+
+# DEVELOPER: Run from source with CLI options
+python main.py --help
+
+# SIMPLE: GUI only (no protection, for testing)
+python gui.py
 ```
 
 ### Alternative Installation
