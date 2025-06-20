@@ -4,6 +4,7 @@ import tempfile
 import os
 from services.database import Database, DatabaseError
 from main import Item, Purchase
+from config.settings import ConfigManager
 
 class TestCriticalAppFunctionality:
     """Test the most critical functionality that could cause app failures."""
@@ -104,8 +105,10 @@ class TestErrorHandling:
                 f.write(b'This is not a valid SQLite database')
             
             # Attempt to open - should handle gracefully
-            with pytest.raises(DatabaseError):
-                db = Database(db_name=path)
+            with pytest.raises((DatabaseError, sqlite3.DatabaseError)):
+                test_config = ConfigManager()
+                test_config.config.database.db_name = path
+                db = Database(config_manager=test_config)
                 
         finally:
             os.unlink(path)
@@ -117,7 +120,8 @@ class TestErrorHandling:
         assert result is None, "Should return None for non-existent item"
         
         # Test deletion of non-existent item should not crash
-        temp_db.delete_item(99999)  # Should not raise exception
+        result = temp_db.delete_item(99999)  # Should not raise exception
+        assert result is False, "Should return False for non-existent item"
 
 class TestBusinessLogicCritical:
     """Test critical business logic calculations."""

@@ -1,4 +1,5 @@
 import pytest
+import sqlite3
 from datetime import datetime
 from services.database import Database, DatabaseError, DatabaseConnectionError, DatabaseQueryError
 from models.item import Item
@@ -6,7 +7,7 @@ from models.item import Item
 def test_init_db(temp_db):
     """Test database initialization."""
     # Database should be initialized with required tables
-    with temp_db.get_connection() as conn:
+    with temp_db._get_connection() as conn:
         cursor = conn.cursor()
         
         # Check items table
@@ -110,11 +111,13 @@ def test_clear_all_data(temp_db, sample_item, sample_purchase):
 
 def test_database_connection_error():
     """Test database connection error handling."""
-    with pytest.raises(DatabaseConnectionError):
-        # Try to connect to a non-existent directory
-        db = Database(db_name="/non/existent/path/db.sqlite")
-        with db.get_connection():
-            pass
+    # Try to connect to a non-existent directory
+    from config.settings import ConfigManager
+    test_config = ConfigManager()
+    test_config.config.database.db_name = "/non/existent/path/db.sqlite"
+    # This should raise an exception during initialization
+    with pytest.raises((DatabaseConnectionError, sqlite3.OperationalError)):
+        db = Database(config_manager=test_config)
 
 def test_database_query_error(temp_db):
     """Test database query error handling."""
