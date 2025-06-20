@@ -19,13 +19,25 @@ def temp_db():
     fd, path = tempfile.mkstemp()
     os.close(fd)
     
-    # Create database instance
-    db = Database(db_name=path)
+    # Create a test config manager with the temporary database path
+    test_config = ConfigManager()
+    test_config.config.database.db_name = path
+    
+    # Create database instance with config manager
+    db = Database(config_manager=test_config)
+    
+    # Disable protection features for testing
+    if hasattr(db, 'protection') and db.protection:
+        db.protection.config["protection_enabled"] = False
+        db.protection.config["auto_backup_enabled"] = False
     
     yield db
     
     # Clean up
-    os.unlink(path)
+    try:
+        os.unlink(path)
+    except FileNotFoundError:
+        pass
 
 @pytest.fixture
 def sample_item():
