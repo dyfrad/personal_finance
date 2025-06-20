@@ -8,22 +8,50 @@ and this project adheres to [Semantic Versioning](https://semver.org/en/2.0.0/).
 ### Added
 - **GNU Affero General Public License v3.0 (AGPL-3.0)**: Complete license implementation
   - Added comprehensive LICENSE file with full AGPL-3.0 text
-  - Updated all source files with proper license headers
+  - Updated all source files with proper license headers and copyright notices
   - Added license information to setup.py and configuration files
   - Created license information script for easy access to license details
   - Updated README.md with detailed license section and requirements
 - **License Compliance**: Full compliance with AGPL-3.0 requirements
-  - Copyright notices on all source files
-  - License information in package metadata
+  - Copyright notices on all source files (main.py, gui.py, database.py)
+  - License information in package metadata (setup.py, config/version.py)
   - License headers following GNU standards
   - License documentation and user guidance
+- **License Management Tools**: New utility for license information access
+  - Created scripts/show_license.py with multiple output formats
+  - Support for summary, full license text, copyright notice, and comprehensive display
+  - User-friendly command-line interface with help documentation
+  - Easy access to license information and user rights
 
 ### Documentation
 - **License Documentation**: Comprehensive license information
-  - Detailed license summary in README.md
+  - Detailed license summary in README.md with user rights and requirements
   - License requirements and user rights explanation
   - Copyright notice and attribution
   - Links to full license text and official sources
+  - Created LICENSE_IMPLEMENTATION_SUMMARY.md with complete implementation details
+  - Updated docs/LICENSE_HEADER_TEMPLATE.txt with improved usage instructions
+
+### Fixed
+- **Test Infrastructure**: Complete test framework compatibility updates
+  - Fixed Database constructor calls to use ConfigManager instead of direct db_name parameter
+  - Updated test configuration to disable database protection features during testing
+  - Fixed method signatures for add_purchase(), delete_item(), and update_item() methods
+  - Added proper error handling for database connection and query operations
+  - Updated database connection method calls to use private _get_connection()
+  - Fixed exception handling tests to expect correct DatabaseError types
+  - Ensured all 33 tests pass with updated Database service API
+- **Database Service Compatibility**: Enhanced backward compatibility and consistency
+  - Aligned purchases table schema with consistent field names (date, amount, price)
+  - Updated add_purchase() method to accept Purchase objects for better type safety
+  - Made delete_item() table_name parameter optional with automatic detection
+  - Improved database protection configuration handling during testing
+  - Fixed method signatures across Database service for consistency
+
+### Changed
+- Updated version to 0.2.1 to reflect license implementation
+- Enhanced license header template with better usage instructions
+- Improved documentation structure with dedicated license section
 
 ## [0.2.0] - 2025-06-19
 ### Added
