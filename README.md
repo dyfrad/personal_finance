@@ -27,11 +27,10 @@ The dashboard provides a comprehensive view of your financial portfolio with rea
 - **Category-Specific Forms**: Tailored input forms for investments, inventory, and expenses
 - **Responsive Design**: Optimized for different screen sizes and platforms
 
-### Data Protection
-- **Database Protection**: Automatic protection against accidental deletion with read-only permissions
-- **Automatic Backups**: Every 6 hours + event-driven backups with configurable retention
-- **Emergency Recovery**: Multiple confirmation layers and safety backups for restoration
+### Data Security
 - **Local Storage**: All data stored privately on your device
+- **Privacy First**: Your financial information remains completely private
+- **Data Sovereignty**: You maintain full control over your data
 
 ## Quick Start
 
@@ -62,7 +61,7 @@ personal-finance-manager
 pip install -r requirements.txt
 
 # Run the application
-python main.py              # Full version with database protection
+python main.py              # Start the application
 python main.py --help       # See all available options
 python gui.py               # Simple GUI only (for testing)
 ```
@@ -82,15 +81,6 @@ python gui.py               # Simple GUI only (for testing)
 - **Expenses**: Simplified forms with amount and date
 - **Export**: CSV export for data portability
 
-### Database Protection
-Your database is automatically protected with:
-- **Automatic backups** every 6 hours
-- **Protection status**: `python main.py --check-protection`
-- **Manual backup**: `python scripts/protect_database.py backup --name "my_backup"`
-- **Emergency recovery**: Available if needed
-
-See [PROTECTION_QUICK_START.md](PROTECTION_QUICK_START.md) for detailed protection commands.
-
 ## Documentation
 
 ### User Guides
@@ -108,7 +98,6 @@ See [PROTECTION_QUICK_START.md](PROTECTION_QUICK_START.md) for detailed protecti
 
 ## Quality Assurance
 - **33 Comprehensive Tests**: Complete test coverage for critical functionality
-- **Database Protection Framework**: Comprehensive safeguards against accidental data loss
 - **Error Handling**: Graceful degradation for database and network issues
 - **Performance Testing**: Verified with large portfolios (50+ items, 20+ purchases per item)
 

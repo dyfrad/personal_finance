@@ -7,7 +7,6 @@ import json
 class DatabaseConfig:
     """Database configuration settings."""
     db_name: str = "finance.db"
-    max_connections: int = 5
 
 @dataclass
 class UIConfig:
@@ -78,8 +77,7 @@ class ConfigManager:
         """
         return {
             'database': {
-                'db_name': config.database.db_name,
-                'max_connections': config.database.max_connections
+                'db_name': config.database.db_name
             },
             'ui': {
                 'theme': config.ui.theme,

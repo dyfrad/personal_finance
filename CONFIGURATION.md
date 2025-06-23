@@ -4,9 +4,7 @@
 ```json
 {
     "database": {
-        "db_name": "finance.db",
-        "backup_dir": "backups",
-        "max_connections": 5
+        "db_name": "finance.db"
     },
     "ui": {
         "theme": "dark",
@@ -40,34 +38,6 @@ __description__ = "A sophisticated Python-based..."  # App description
 ```
 
 **Important**: Only edit `config/version.py` directly if you need to change version information. For version updates, use the automated script: `python scripts/update_version.py <new_version>`.
-
-## Database Protection Configuration
-
-### Protection Settings (`database_protection.json`)
-```json
-{
-    "protection_enabled": true,
-    "auto_backup_enabled": true,
-    "backup_interval_hours": 6,
-    "max_backups": 10,
-    "backup_on_startup": true,
-    "backup_on_shutdown": true
-}
-```
-
-### Protection Commands
-```bash
-# Check protection status
-python main.py --check-protection
-python scripts/protect_database.py status
-
-# Create manual backup before important changes
-python scripts/protect_database.py backup --name "before_important_change"
-
-# Emergency recovery (if needed)
-python scripts/protect_database.py list-backups
-python scripts/protect_database.py restore backup_name --confirm
-```
 
 ## UI Configuration
 
