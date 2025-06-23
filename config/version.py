@@ -17,7 +17,7 @@ __license_url__ = "https://www.gnu.org/licenses/agpl-3.0.html"
 
 # Description used across the application
 __description__ = (
-    "A sophisticated Python-based personal finance management application "
-    "that helps you track and manage your financial portfolio with advanced "
-    "features for investments, inventory, and expenses."
+    "A Python-based personal finance management application "
+    "that helps you track and manage your "
+    "investments, household inventory, and expenses."
 ) 

@@ -2,7 +2,7 @@
 """
 Personal Finance Manager
 
-A sophisticated Python-based personal finance management application that helps you track and manage your financial portfolio with advanced features for investments, inventory, and expenses.
+A Python-based personal finance management application that helps you track investments, household inventory, and expenses.
 
 Copyright (c) 2025 Mohit Saharan
 
