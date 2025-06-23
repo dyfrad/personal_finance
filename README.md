@@ -85,15 +85,12 @@ python gui.py               # Simple GUI only (for testing)
 
 ### User Guides
 - **[Configuration Guide](CONFIGURATION.md)**: Settings, themes, and environment variables
-- **[Troubleshooting Guide](TROUBLESHOOTING.md)**: Common issues and solutions
 
 ### Developer Resources
 - **[Development Guide](DEVELOPMENT.md)**: Version management, testing, and workflow
-- **[Architecture Guide](ARCHITECTURE.md)**: Technical architecture and design decisions
 - **[Changelog](CHANGELOG.md)**: Version history and updates
 
 ### Additional Resources
-- `docs/`: Architectural Decision Records and detailed documentation
 - `tests/`: Comprehensive test suite (33 tests, 100% passing)
 
 ## Quality Assurance
