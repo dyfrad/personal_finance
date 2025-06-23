@@ -60,10 +60,7 @@ Thumbs.db
 
 # Project specific
 config.json
-backups/
-database_protection.json
 .*.lock
-archive/
 
 # Byte-compiled / optimized / DLL files
 *.manifest

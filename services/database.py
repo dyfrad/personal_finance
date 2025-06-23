@@ -9,14 +9,6 @@ from models.purchase import Purchase
 from config.settings import ConfigManager
 from utils.logging import get_logger
 
-# Import the database protection framework
-try:
-    from utils.database_protection import DatabaseProtection, safe_operation
-    PROTECTION_AVAILABLE = True
-except ImportError:
-    PROTECTION_AVAILABLE = False
-    print("Database protection not available")
-
 logger = get_logger(__name__)
 
 class DatabaseError(Exception):
@@ -32,24 +24,13 @@ class DatabaseQueryError(DatabaseError):
     pass
 
 class Database:
-    """Enhanced database service with integrated protection framework."""
+    """Enhanced database service for personal finance management."""
     
     def __init__(self, config_manager: Optional[ConfigManager] = None):
-        """Initialize database with protection framework."""
+        """Initialize database."""
         self.config_manager = config_manager or ConfigManager()
         self.config = self.config_manager.get_config()
         self.db_path = self.config.database.db_name
-        
-        # Initialize database protection
-        if PROTECTION_AVAILABLE:
-            self.protection = DatabaseProtection(self.db_path)
-            # Run auto backup check on initialization
-            try:
-                self.protection.auto_backup_if_needed()
-            except Exception as e:
-                logger.warning(f"Auto backup check failed: {e}")
-        else:
-            self.protection = None
         
         # Initialize database
         self._init_database()
@@ -135,49 +116,13 @@ class Database:
             logger.info("Database initialized successfully")
 
     def _get_connection(self) -> sqlite3.Connection:
-        """Get database connection with protection considerations."""
+        """Get database connection."""
         if not os.path.exists(self.db_path):
             logger.warning(f"Database file not found: {self.db_path}")
         
         conn = sqlite3.connect(self.db_path)
         conn.row_factory = sqlite3.Row
         return conn
-
-    def safe_operation_context(self, operation_name: str = "database_operation"):
-        """Get a safe operation context manager for database operations."""
-        if (self.protection and PROTECTION_AVAILABLE and 
-            self.protection.config.get("protection_enabled", True) and
-            self.protection.config.get("auto_backup_enabled", True)):
-            return self.protection.safe_database_operation(operation_name)
-        else:
-            # Fallback context manager that does nothing
-            from contextlib import nullcontext
-            return nullcontext()
-
-    def create_backup(self, backup_name: Optional[str] = None) -> Optional[str]:
-        """Create a manual backup of the database."""
-        if self.protection and PROTECTION_AVAILABLE:
-            try:
-                backup_path = self.protection.create_backup(backup_name)
-                logger.info(f"Manual backup created: {backup_path}")
-                return str(backup_path)
-            except Exception as e:
-                logger.error(f"Manual backup failed: {e}")
-                return None
-        else:
-            logger.warning("Database protection not available - backup skipped")
-            return None
-
-    def get_protection_status(self) -> Dict[str, Any]:
-        """Get database protection status."""
-        if self.protection and PROTECTION_AVAILABLE:
-            return self.protection.status()
-        else:
-            return {
-                "protection_available": False,
-                "database_path": self.db_path,
-                "message": "Database protection framework not available"
-            }
 
     def insert_base_item(self, item: Item) -> int:
         """Insert a base item into the items table.
@@ -211,7 +156,7 @@ class Database:
             raise DatabaseQueryError(f"Failed to insert item: {e}")
 
     def add_purchase(self, item_id: int, purchase: Purchase, table_name: str = "investments") -> int:
-        """Add purchase with protection framework.
+        """Add purchase to the database.
         
         Args:
             item_id (int): ID of the item
@@ -221,19 +166,18 @@ class Database:
         Returns:
             int: ID of the created purchase
         """
-        with self.safe_operation_context("add_purchase"):
-            with self._get_connection() as conn:
-                now = datetime.now().isoformat()
-                cursor = conn.execute('''
-                    INSERT INTO purchases (item_id, table_name, date, amount, price, created_at, updated_at)
-                    VALUES (?, ?, ?, ?, ?, ?, ?)
-                ''', (item_id, table_name, purchase.date, purchase.amount, purchase.price, now, now))
-                
-                purchase_id = cursor.lastrowid
-                conn.commit()
-                
-                logger.info(f"Added purchase for {table_name} item {item_id}: {purchase.amount} @ ${purchase.price}")
-                return purchase_id
+        with self._get_connection() as conn:
+            now = datetime.now().isoformat()
+            cursor = conn.execute('''
+                INSERT INTO purchases (item_id, table_name, date, amount, price, created_at, updated_at)
+                VALUES (?, ?, ?, ?, ?, ?, ?)
+            ''', (item_id, table_name, purchase.date, purchase.amount, purchase.price, now, now))
+            
+            purchase_id = cursor.lastrowid
+            conn.commit()
+            
+            logger.info(f"Added purchase for {table_name} item {item_id}: {purchase.amount} @ ${purchase.price}")
+            return purchase_id
 
     def get_item_by_id(self, item_id: int) -> Optional[Item]:
         """Retrieve an item by its ID.
@@ -335,7 +279,7 @@ class Database:
             raise DatabaseQueryError(f"Failed to retrieve items: {e}")
 
     def update_item(self, item_or_table_name, item_id_or_kwargs=None, **kwargs) -> bool:
-        """Update item with protection framework.
+        """Update item in the database.
         
         Args:
             item_or_table_name: Either an Item object (old style) or table_name (new style)
@@ -345,61 +289,60 @@ class Database:
         Returns:
             bool: True if update successful, False otherwise
         """
-        with self.safe_operation_context("update_item"):
-            with self._get_connection() as conn:
-                # Handle backward compatibility - if first arg is an Item object
-                if hasattr(item_or_table_name, 'id'):
-                    item = item_or_table_name
-                    item_id = item.id
-                    table_name = 'items'  # Default table for compatibility
-                    
-                    # Build update data from item object
-                    update_data = {
-                        'name': item.name,
-                        'purchase_price': item.purchase_price,
-                        'date_of_purchase': item.date_of_purchase,
-                        'current_value': item.current_value,
-                        'profit_loss': item.profit_loss,
-                        'category': item.category
-                    }
-                else:
-                    # New style call: update_item(table_name, item_id, **kwargs)
-                    table_name = item_or_table_name
-                    item_id = item_id_or_kwargs
-                    update_data = kwargs
+        with self._get_connection() as conn:
+            # Handle backward compatibility - if first arg is an Item object
+            if hasattr(item_or_table_name, 'id'):
+                item = item_or_table_name
+                item_id = item.id
+                table_name = 'items'  # Default table for compatibility
                 
-                # Build SET clause dynamically
-                set_clauses = []
-                values = []
-                
-                for key, value in update_data.items():
-                    if key in ['name', 'purchase_price', 'date_of_purchase', 'current_value', 'profit_loss', 'category']:
-                        set_clauses.append(f"{key} = ?")
-                        values.append(value)
-                
-                if not set_clauses:
-                    return False
-                
-                # Always update the updated_at timestamp
-                set_clauses.append("updated_at = ?")
-                values.append(datetime.now().isoformat())
-                
-                values.append(item_id)
-                
-                query = f"UPDATE {table_name} SET {', '.join(set_clauses)} WHERE id = ?"
-                cursor = conn.execute(query, values)
-                conn.commit()
-                
-                success = cursor.rowcount > 0
-                if success:
-                    logger.info(f"Updated item in {table_name}: ID {item_id}")
-                else:
-                    logger.warning(f"No item found to update in {table_name}: ID {item_id}")
-                
-                return success
+                # Build update data from item object
+                update_data = {
+                    'name': item.name,
+                    'purchase_price': item.purchase_price,
+                    'date_of_purchase': item.date_of_purchase,
+                    'current_value': item.current_value,
+                    'profit_loss': item.profit_loss,
+                    'category': item.category
+                }
+            else:
+                # New style call: update_item(table_name, item_id, **kwargs)
+                table_name = item_or_table_name
+                item_id = item_id_or_kwargs
+                update_data = kwargs
+            
+            # Build SET clause dynamically
+            set_clauses = []
+            values = []
+            
+            for key, value in update_data.items():
+                if key in ['name', 'purchase_price', 'date_of_purchase', 'current_value', 'profit_loss', 'category']:
+                    set_clauses.append(f"{key} = ?")
+                    values.append(value)
+            
+            if not set_clauses:
+                return False
+            
+            # Always update the updated_at timestamp
+            set_clauses.append("updated_at = ?")
+            values.append(datetime.now().isoformat())
+            
+            values.append(item_id)
+            
+            query = f"UPDATE {table_name} SET {', '.join(set_clauses)} WHERE id = ?"
+            cursor = conn.execute(query, values)
+            conn.commit()
+            
+            success = cursor.rowcount > 0
+            if success:
+                logger.info(f"Updated item in {table_name}: ID {item_id}")
+            else:
+                logger.warning(f"No item found to update in {table_name}: ID {item_id}")
+            
+            return success
 
     def delete_item(self, item_id: int, table_name: str = None) -> bool:
-        """Delete item with protection framework.
+        """Delete item from the database.
         
         Args:
             item_id (int): ID of the item to delete
@@ -408,67 +351,65 @@ class Database:
         Returns:
             bool: True if item was deleted, False otherwise
         """
-        with self.safe_operation_context("delete_item"):
-            with self._get_connection() as conn:
-                # Find the item if table_name not provided
+        with self._get_connection() as conn:
+            # Find the item if table_name not provided
+            if table_name is None:
+                # Check all tables for the item
+                tables = ['items', 'investments', 'inventory', 'expenses']
+                for table in tables:
+                    cursor = conn.execute(f"SELECT id FROM {table} WHERE id = ?", (item_id,))
+                    if cursor.fetchone():
+                        table_name = table
+                        break
+                
                 if table_name is None:
-                    # Check all tables for the item
-                    tables = ['items', 'investments', 'inventory', 'expenses']
-                    for table in tables:
-                        cursor = conn.execute(f"SELECT id FROM {table} WHERE id = ?", (item_id,))
-                        if cursor.fetchone():
-                            table_name = table
-                            break
-                    
-                    if table_name is None:
-                        logger.warning(f"No item found with ID {item_id}")
-                        return False
-                
-                # First delete related purchases
-                conn.execute("DELETE FROM purchases WHERE item_id = ?", (item_id,))
-                
-                # Then delete the item
-                cursor = conn.execute(f"DELETE FROM {table_name} WHERE id = ?", (item_id,))
-                conn.commit()
-                
-                success = cursor.rowcount > 0
-                if success:
-                    logger.info(f"Deleted item from {table_name}: ID {item_id}")
-                else:
-                    logger.warning(f"No item found to delete in {table_name}: ID {item_id}")
-                
-                return success
+                    logger.warning(f"No item found with ID {item_id}")
+                    return False
+            
+            # First delete related purchases
+            conn.execute("DELETE FROM purchases WHERE item_id = ?", (item_id,))
+            
+            # Then delete the item
+            cursor = conn.execute(f"DELETE FROM {table_name} WHERE id = ?", (item_id,))
+            conn.commit()
+            
+            success = cursor.rowcount > 0
+            if success:
+                logger.info(f"Deleted item from {table_name}: ID {item_id}")
+            else:
+                logger.warning(f"No item found to delete in {table_name}: ID {item_id}")
+            
+            return success
 
     def add_item(self, table_name: str, name: str, purchase_price: float, 
                  date_of_purchase: str, current_value: Optional[float] = None,
                  category: str = None) -> int:
-        """Add item with protection framework."""
-        with self.safe_operation_context("add_item"):
-            with self._get_connection() as conn:
-                if current_value is None:
-                    current_value = purchase_price
-                
-                profit_loss = current_value - purchase_price
-                
-                if category is None:
-                    category_map = {
-                        'investments': 'Investment',
-                        'inventory': 'Inventory', 
-                        'expenses': 'Expense'
-                    }
-                    category = category_map.get(table_name, 'Unknown')
-                
-                cursor = conn.execute(f'''
-                    INSERT INTO {table_name} 
-                    (name, purchase_price, date_of_purchase, current_value, profit_loss, category, updated_at)
-                    VALUES (?, ?, ?, ?, ?, ?, ?)
-                ''', (name, purchase_price, date_of_purchase, current_value, profit_loss, category, datetime.now().isoformat()))
-                
-                item_id = cursor.lastrowid
-                conn.commit()
-                
-                logger.info(f"Added item to {table_name}: {name} (ID: {item_id})")
-                return item_id
+        """Add item to the database."""
+        with self._get_connection() as conn:
+            if current_value is None:
+                current_value = purchase_price
+            
+            profit_loss = current_value - purchase_price
+            
+            if category is None:
+                category_map = {
+                    'investments': 'Investment',
+                    'inventory': 'Inventory', 
+                    'expenses': 'Expense'
+                }
+                category = category_map.get(table_name, 'Unknown')
+            
+            cursor = conn.execute(f'''
+                INSERT INTO {table_name} 
+                (name, purchase_price, date_of_purchase, current_value, profit_loss, category, updated_at)
+                VALUES (?, ?, ?, ?, ?, ?, ?)
+            ''', (name, purchase_price, date_of_purchase, current_value, profit_loss, category, datetime.now().isoformat()))
+            
+            item_id = cursor.lastrowid
+            conn.commit()
+            
+            logger.info(f"Added item to {table_name}: {name} (ID: {item_id})")
+            return item_id
 
     def clear_all_data(self) -> None:
         """Clear all data from the database.

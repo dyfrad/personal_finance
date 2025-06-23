@@ -26,11 +26,6 @@ def temp_db():
     # Create database instance with config manager
     db = Database(config_manager=test_config)
     
-    # Disable protection features for testing
-    if hasattr(db, 'protection') and db.protection:
-        db.protection.config["protection_enabled"] = False
-        db.protection.config["auto_backup_enabled"] = False
-    
     yield db
     
     # Clean up
