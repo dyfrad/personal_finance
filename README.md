@@ -1,121 +1,55 @@
 # Personal Finance Manager
 
-A Python-based personal finance management application that helps you track your investments, inventory, and expenses. Designed for individual use with local data storage and privacy protection.
+A Python-based personal finance management application for tracking investments, inventory, and expenses. Features local data storage, real-time stock analysis, and privacy-first design.
 
-## Application Overview
 ![Personal Finance Manager Dashboard](docs/images/dashboard_0.2.0.png)
 
-The dashboard provides a comprehensive view of your financial portfolio with real-time stock performance tracking, expense monitoring, and portfolio management controls.
+## Features
 
-## Key Features
+- **Investment Tracking**: Stocks, bonds, crypto, real estate with multiple purchase support
+- **Inventory Management**: Track physical assets and collectibles
+- **Expense Monitoring**: Simple expense recording and categorization
+- **Technical Analysis**: Real-time charts with RSI, MACD, moving averages
+- **Modern UI**: Material Design with light/dark themes
+- **Privacy First**: All data stored locally on your device
 
-### Portfolio Management
-- **Investment Tracking**: Manage stocks, bonds, crypto, real estate, and gold with multiple purchase tracking
-- **Inventory Management**: Track appliances, electronics, furniture, transportation, home improvements, savings, and collectibles
-- **Expense Tracking**: Record and monitor expenses with simplified entry forms
-- **Multi-Purchase Support**: Track multiple purchases for investment items with detailed transaction history
+## Installation
 
-### Advanced Analytics
-- **Performance Graphs**: Real-time stock performance visualization with technical indicators
-- **Technical Analysis**: Moving averages (SMA, EMA), RSI, MACD indicators
-- **Interactive Charts**: Hover details, comparison features, and historical data analysis
-- **Profit/Loss Calculations**: Accurate financial calculations for all item types
+**Prerequisites**: Python 3.8+
 
-### Modern User Interface
-- **Four-Quadrant Dashboard**: Organized layout with stock performance, expenses, and action buttons
-- **Google Material Design**: Professional theme with light/dark mode support
-- **Category-Specific Forms**: Tailored input forms for investments, inventory, and expenses
-- **Responsive Design**: Optimized for different screen sizes and platforms
-
-### Data Security
-- **Local Storage**: All data stored privately on your device
-- **Privacy First**: Your financial information remains completely private
-- **Data Sovereignty**: You maintain full control over your data
-
-## Quick Start
-
-### Prerequisites
-- Python 3.8 or higher
-- pip package manager
-
-### Installation
 ```bash
-# Clone the repository
+# Clone and setup
 git clone <repository-url>
 cd personal_finance
-
-# Create and activate virtual environment
 python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
+source venv/bin/activate  # Windows: venv\Scripts\activate
 
-# Install the application
+# Install and run
 pip install -e .
-
-# Run the application
 personal-finance-manager
-```
 
-### Alternative - Run from Source
-```bash
-# Install dependencies
+# Or run from source
 pip install -r requirements.txt
-
-# Run the application
-python main.py              # Start the application
-python main.py --help       # See all available options
-python gui.py               # Simple GUI only (for testing)
+python main.py
 ```
 
 ## Usage
 
-### Getting Started
-1. **Launch**: Run `personal-finance-manager` or `python main.py`
-2. **Dashboard**: Four-quadrant view with stocks, expenses, and controls
-3. **Add Items**: Use category-specific forms for investments, inventory, or expenses
-4. **View Portfolio**: Comprehensive table with detailed financial information
-5. **Analyze**: Interactive charts with technical indicators
-
-### Managing Your Portfolio
-- **Investments**: Track multiple purchases with shares/units and price per unit
-- **Inventory**: Single or multiple purchase tracking for physical items
-- **Expenses**: Simplified forms with amount and date
-- **Export**: CSV export for data portability
+1. **Add Items**: Use forms for investments, inventory, or expenses
+2. **View Portfolio**: Track performance in the main dashboard
+3. **Analyze**: Interactive charts with technical indicators
+4. **Export**: CSV export for data portability
 
 ## Documentation
 
-### User Guides
-- **[Configuration Guide](CONFIGURATION.md)**: Settings, themes, and environment variables
-
-### Developer Resources
-- **[Development Guide](DEVELOPMENT.md)**: Version management, testing, and workflow
-- **[Changelog](CHANGELOG.md)**: Version history and updates
-
-### Additional Resources
-- `tests/`: Comprehensive test suite (33 tests, 100% passing)
-
-## Quality Assurance
-- **33 Comprehensive Tests**: Complete test coverage for critical functionality
-- **Error Handling**: Graceful degradation for database and network issues
-- **Performance Testing**: Verified with large portfolios (50+ items, 20+ purchases per item)
+- **[Configuration Guide](CONFIGURATION.md)**: Settings and themes
+- **[Development Guide](DEVELOPMENT.md)**: Testing and workflow
+- **[Changelog](CHANGELOG.md)**: Version history
 
 ## License
 
-This project is licensed under the **GNU Affero General Public License v3.0 (AGPL-3.0)**.
-
-- **Freedom to use, study, modify, and share**
-- **Network server provision**: Modified versions on servers must provide source code
-- **Source code availability**: Distributed software must include complete source code
-
-See [LICENSE](LICENSE) for complete details.
-
-## Privacy & Security
-
-This is a **personal finance application** designed for individual use:
-- **Local Data Storage**: All financial data stored locally on your device
-- **No Cloud Services**: No data transmitted to external servers
-- **Privacy First**: Your financial information remains completely private
-- **Data Sovereignty**: You maintain full control over your data
+Licensed under **GNU Affero General Public License v3.0 (AGPL-3.0)**. See [LICENSE](LICENSE) for details.
 
 ---
 
-**Built for personal finance management**
+**Personal finance management with privacy-first design. All data stored locally.**
