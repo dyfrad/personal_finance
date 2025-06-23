@@ -34,13 +34,6 @@ from config.settings import ConfigManager
 from config.version import __version__, __app_name__, __description__, __author__
 from utils.logging import setup_logging, get_logger
 
-# Import database protection
-try:
-    from utils.database_protection import DatabaseProtection
-    PROTECTION_AVAILABLE = True
-except ImportError:
-    PROTECTION_AVAILABLE = False
-
 import pandas as pd
 import numpy as np
 import os 
@@ -226,7 +219,7 @@ def load_portfolio():
     return items
 
 def init_application():
-    """Initialize the application with protection framework."""
+    """Initialize the application."""
     # Initialize configuration
     config_manager = ConfigManager()
     config = config_manager.get_config()
@@ -236,33 +229,7 @@ def init_application():
     logger = get_logger(__name__)
     logger.info(f"Starting {__app_name__} v{__version__}")
     
-    # Initialize database protection
-    if PROTECTION_AVAILABLE:
-        try:
-            protection = DatabaseProtection(config.database.db_name)
-            status = protection.status()
-            
-            logger.info(f"Database protection initialized")
-            logger.info(f"Database: {status['database_path']}")
-            logger.info(f"Protection enabled: {status['protection_enabled']}")
-            logger.info(f"Auto backup: {status['auto_backup_enabled']}")
-            
-            # Run auto backup check
-            protection.auto_backup_if_needed()
-            
-            # Apply protection if enabled
-            if status['protection_enabled']:
-                protection.protect_database()
-                logger.info("Database protection applied")
-            
-            return config_manager, protection
-            
-        except Exception as e:
-            logger.error(f"Failed to initialize database protection: {e}")
-            return config_manager, None
-    else:
-        logger.warning("Database protection framework not available")
-        return config_manager, None
+    return config_manager
 
 def main():
     """Main application entry point."""
@@ -272,22 +239,8 @@ def main():
         epilog="""
 Examples:
   python main.py                    # Start GUI application
-  python main.py --backup           # Create backup before starting
-  python main.py --check-protection # Check protection status
   python main.py --console          # Run in console mode (future feature)
         """
-    )
-    
-    parser.add_argument(
-        '--backup', '-b',
-        action='store_true',
-        help='Create a backup before starting the application'
-    )
-    
-    parser.add_argument(
-        '--check-protection', '-c',
-        action='store_true',
-        help='Check database protection status and exit'
     )
     
     parser.add_argument(
@@ -305,44 +258,11 @@ Examples:
     args = parser.parse_args()
     
     # Initialize application
-    config_manager, protection = init_application()
+    config_manager = init_application()
     
     if args.debug:
         logging.getLogger().setLevel(logging.DEBUG)
         logging.debug("Debug logging enabled")
-    
-    # Handle protection check
-    if args.check_protection:
-        if protection:
-            status = protection.status()
-            print("Database Protection Status")
-            print("=" * 40)
-            print(f"Database: {status['database_path']}")
-            print(f"Protection: {'Enabled' if status['protection_enabled'] else 'Disabled'}")
-            print(f"Auto Backup: {'Enabled' if status['auto_backup_enabled'] else 'Disabled'}")
-            print(f"Backup Count: {status['backup_count']}")
-            print(f"Last Backup: {status['last_backup'] or 'Never'}")
-            
-            backups = protection.list_backups()
-            if backups:
-                print(f"\nRecent Backups:")
-                for backup in backups[:3]:  # Show last 3 backups
-                    print(f"  • {backup['name']}")
-        else:
-            print("Database protection not available")
-        return
-    
-    # Handle backup request
-    if args.backup:
-        if protection:
-            try:
-                backup_path = protection.create_backup("manual_startup")
-                print(f"Backup created: {backup_path}")
-            except Exception as e:
-                print(f"Backup failed: {e}")
-                sys.exit(1)
-        else:
-            print("Database protection not available - backup skipped")
     
     # Handle console mode (future feature)
     if args.console:
@@ -358,30 +278,13 @@ Examples:
         logger = logging.getLogger(__name__)
         logger.info("Starting GUI application")
         
-        # Temporarily remove protection for GUI operations
-        if protection:
-            protection.unprotect_database()
-        
         # Create and run the application
         root = tk.Tk()
         db = Database()
         dashboard = MainDashboard(root, db)
         
-        # Ensure protection is reapplied when app closes
-        def on_app_close():
-            if protection:
-                try:
-                    # Create closing backup
-                    protection.create_backup("app_shutdown")
-                    # Reapply protection
-                    protection.protect_database()
-                    logger.info("Database protection reapplied on shutdown")
-                except Exception as e:
-                    logger.error(f"Failed to reapply protection on shutdown: {e}")
-            root.destroy()
-        
         # Set up close handler
-        root.protocol("WM_DELETE_WINDOW", on_app_close)
+        root.protocol("WM_DELETE_WINDOW", root.destroy)
         
         # Run the application
         root.mainloop()
@@ -396,15 +299,6 @@ Examples:
     except Exception as e:
         logger.error(f"Application error: {e}")
         print(f"Application error: {e}")
-        
-        # Ensure protection is reapplied even on error
-        if protection:
-            try:
-                protection.protect_database()
-                logger.info("Database protection reapplied after error")
-            except Exception as pe:
-                logger.error(f"Failed to reapply protection after error: {pe}")
-        
         sys.exit(1)
 
 if __name__ == "__main__":
