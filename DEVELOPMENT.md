@@ -19,9 +19,7 @@ from config.version import __version__, __app_name__, __description__
 ## Development Workflow
 
 ```bash
-# 1. Make changes and test
-python -m pytest tests/ -v
-
+# 1. Make changes
 # 2. Update version for release
 python scripts/update_version.py 0.3.0
 
@@ -30,20 +28,4 @@ python scripts/update_version.py 0.3.0
 git add .
 git commit -m "feat: new feature in v0.3.0"
 git tag v0.3.0
-```
-
-## Testing
-
-**33 comprehensive tests** covering critical functionality, database operations, and data models.
-
-```bash
-# Run all tests
-python -m pytest tests/ -v
-
-# Run specific categories
-python -m pytest tests/test_app_critical.py -v
-python -m pytest tests/test_database.py -v
-python -m pytest tests/test_models.py -v
-```
-
-**Current status**: 33/33 tests passing (100% success rate) 
+``` 

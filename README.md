@@ -43,7 +43,7 @@ python main.py
 ## Documentation
 
 - **[Configuration Guide](CONFIGURATION.md)**: Settings and themes
-- **[Development Guide](DEVELOPMENT.md)**: Testing and workflow
+- **[Development Guide](DEVELOPMENT.md)**: Development workflow
 - **[Changelog](CHANGELOG.md)**: Version history
 
 ## License

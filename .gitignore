@@ -37,7 +37,6 @@ ENV/
 # Testing
 .coverage
 htmlcov/
-.pytest_cache/
 .tox/
 nosetests.xml
 coverage.xml
@@ -111,7 +110,6 @@ coverage.xml
 *.cover
 *.py,cover
 .hypothesis/
-.pytest_cache/
 cover/
 
 # Translations
