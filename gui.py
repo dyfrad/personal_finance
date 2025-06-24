@@ -18,87 +18,42 @@ import sqlite3
 from tkinter import filedialog
 import csv
 
-def set_theme(root, light_mode=False):
+def set_theme(root):
     """Configure the application's visual theme.
-    
-    Sets up the ttk styles and colors for the application based on the selected theme.
-    Implements a Google Material Design-inspired theme with both light and dark variants.
-    
-    Args:
-        root (tk.Tk): The root window to apply the theme to
-        light_mode (bool): If True, applies light theme; if False, applies dark theme
     """
     style = ttk.Style(root)
     style.theme_use('clam')
 
-    if light_mode:
-        # Google Material Design Light Theme colors
-        primary_color = '#2196F3'  # Blue 500
-        primary_dark_color = '#1976D2' # Blue 700
-        accent_color = '#FFC107'   # Amber 500
-        background_color = '#FFFFFF' # White
-        surface_color = '#FAFAFA' # Grey 50 for surfaces like cards, entry backgrounds
-        text_primary_color = '#212121' # Grey 900 for primary text
-        text_secondary_color = '#757575' # Grey 600 for secondary text
-        text_hint_color = '#BDBDBD' # Grey 400 for hint text / disabled text
+    # Google Material Design Light Theme colors
+    primary_color = '#2196F3'  # Blue 500
+    primary_dark_color = '#1976D2' # Blue 700
+    accent_color = '#FFC107'   # Amber 500
+    background_color = '#FFFFFF' # White
+    surface_color = '#FAFAFA' # Grey 50 for surfaces like cards, entry backgrounds
+    text_primary_color = '#212121' # Grey 900 for primary text
+    text_secondary_color = '#757575' # Grey 600 for secondary text
+    text_hint_color = '#BDBDBD' # Grey 400 for hint text / disabled text
 
-        style.configure('.', background=background_color, foreground=text_primary_color)
-        style.configure('TLabel', background=background_color, foreground=text_primary_color)
-        style.configure('TFrame', background=background_color)
-        style.configure('TButton', background=primary_color, foreground='#FFFFFF', borderwidth=0)
-        style.configure('TEntry', fieldbackground=surface_color, foreground=text_primary_color, insertcolor=text_primary_color, borderwidth=1, relief="solid", bordercolor=text_hint_color)
-        style.configure('TMenubutton', background=primary_color, foreground='#FFFFFF')
-        style.configure('TCheckbutton', background=background_color, foreground=text_primary_color)
-        style.configure('TLabelframe', background=background_color, foreground=text_primary_color)
-        style.configure('TLabelframe.Label', background=background_color, foreground=text_primary_color)
-        # Treeview
-        style.configure('Treeview', background=surface_color, foreground=text_primary_color, fieldbackground=surface_color, bordercolor=primary_dark_color, rowheight=25)
-        style.configure('Treeview.Heading', background=primary_dark_color, foreground='#FFFFFF')
-        style.map('TButton', background=[('active', primary_dark_color)])
-        style.map('Treeview', background=[('selected', primary_color)])
-        root.configure(bg=background_color)
+    style.configure('.', background=background_color, foreground=text_primary_color)
+    style.configure('TLabel', background=background_color, foreground=text_primary_color)
+    style.configure('TFrame', background=background_color)
+    style.configure('TButton', background=primary_color, foreground='#FFFFFF', borderwidth=0)
+    style.configure('TEntry', fieldbackground=surface_color, foreground=text_primary_color, insertcolor=text_primary_color, borderwidth=1, relief="solid", bordercolor=text_hint_color)
+    style.configure('TMenubutton', background=primary_color, foreground='#FFFFFF')
+    style.configure('TCheckbutton', background=background_color, foreground=text_primary_color)
+    style.configure('TLabelframe', background=background_color, foreground=text_primary_color)
+    style.configure('TLabelframe.Label', background=background_color, foreground=text_primary_color)
+    # Treeview
+    style.configure('Treeview', background=surface_color, foreground=text_primary_color, fieldbackground=surface_color, bordercolor=primary_dark_color, rowheight=25)
+    style.configure('Treeview.Heading', background=primary_dark_color, foreground='#FFFFFF')
+    style.map('TButton', background=[('active', primary_dark_color)])
+    style.map('Treeview', background=[('selected', primary_color)])
+    root.configure(bg=background_color)
 
-        # CustomMessageBox styles for light theme
-        style.configure("Custom.TLabel", foreground=text_primary_color, background=background_color)
-        style.configure("Error.Custom.TLabel", foreground="#D32F2F", background=background_color) # Red 700
-        style.configure("Warning.Custom.TLabel", foreground="#F57C00", background=background_color) # Orange 700
-
-    else:
-        # Google Material Design-inspired colors (Dark Theme - existing)
-        google_primary = '#2196F3'  # Blue 500
-        google_primary_dark = '#1976D2' # Blue 700
-        google_accent = '#FFC107'   # Amber 500
-        google_background_dark = '#424242' # Grey 800
-        google_surface_dark = '#212121' # Grey 900 for deeper elements
-        google_text_light = '#FFFFFF' # White text for dark backgrounds
-        google_text_secondary = '#BDBDBD' # Grey 400 for secondary text
-
-        # General colors
-        dark_bg = google_background_dark
-        dark_fg = google_text_light # Keep foreground light for dark theme
-        accent = google_accent # Use Amber for accent
-
-        style.configure('.', background=dark_bg, foreground=dark_fg)
-        style.configure('TLabel', background=dark_bg, foreground=dark_fg)
-        style.configure('TFrame', background=dark_bg)
-        style.configure('TButton', background=google_primary, foreground=google_text_light, borderwidth=0)
-        style.configure('TEntry', fieldbackground=google_surface_dark, foreground=google_text_light, insertcolor=google_text_light, borderwidth=0)
-        style.configure('TMenubutton', background=google_primary, foreground=google_text_light)
-        style.configure('TCheckbutton', background=dark_bg, foreground=dark_fg)
-        style.configure('TLabelframe', background=dark_bg, foreground=dark_fg)
-        style.configure('TLabelframe.Label', background=dark_bg, foreground=dark_fg)
-        # Treeview
-        style.configure('Treeview', background=google_surface_dark, foreground=google_text_light, fieldbackground=google_surface_dark, bordercolor=google_primary_dark, rowheight=25)
-        style.configure('Treeview.Heading', background=google_primary_dark, foreground=google_text_light)
-        style.map('TButton', background=[('active', google_primary_dark)])
-        style.map('Treeview', background=[('selected', google_primary)]) # Highlight selected item
-        root.configure(bg=dark_bg)
-
-        # Update some styles for CustomMessageBox to fit new theme
-        style.configure("Custom.TLabel", foreground=google_text_light, background=dark_bg)
-        style.configure("Error.Custom.TLabel", foreground="#FF5252", background=dark_bg) # Red A200
-        style.configure("Warning.Custom.TLabel", foreground="#FFD740", background=dark_bg) # Amber A200
-
+    # CustomMessageBox styles for light theme
+    style.configure("Custom.TLabel", foreground=text_primary_color, background=background_color)
+    style.configure("Error.Custom.TLabel", foreground="#D32F2F", background=background_color) # Red 700
+    style.configure("Warning.Custom.TLabel", foreground="#F57C00", background=background_color) # Orange 700
 class EditDialog:
     """Dialog window for editing item details.
     
@@ -117,7 +72,7 @@ class EditDialog:
         self.top.title(f"Edit Item: {item.name}")
         self.top.geometry("400x350")
         self.top.resizable(False, False)
-        set_theme(self.top, light_mode=True)
+        set_theme(self.top)
 
         self.item = item # Store the actual Item object
         
@@ -274,7 +229,7 @@ class PurchasesDialog:
         self.item_id = item_id
         self.item_category = item_category
         self.top = top_level_root # Use the Toplevel provided by show_window
-        set_theme(self.top, light_mode=True) # Apply light theme
+        set_theme(self.top)
         self.top.title(f"Purchases for {item_name}")
         self.top.geometry("500x400")
         # Determine table name based on category
@@ -375,7 +330,7 @@ class AddItemDialog:
         self.category = category
         
         self.top = top_level_root  # Use the Toplevel provided by show_window
-        set_theme(self.top, light_mode=True)  # Apply light theme
+        set_theme(self.top)
         self.top.title("Add New Item")
         self.top.geometry("400x500")
         self.top.transient(parent_for_modality)
@@ -571,7 +526,7 @@ class MainDashboard:
         expenses_frame (ttk.Frame): Frame containing expenses-related controls
     """
     def __init__(self, root, db):
-        set_theme(root, light_mode=True)
+        set_theme(root)
         self.root = root
         self.db = db
         self.root.title("Personal Finance Manager")
@@ -727,7 +682,7 @@ class PersonalFinanceApp:
         right_panel (ttk.Frame): Frame containing right panel controls
     """
     def __init__(self, top_level_root, category=None):
-        set_theme(top_level_root, light_mode=True)
+        set_theme(top_level_root)
         self.root = top_level_root
         self.root.title(f"{category if category else 'All'} Portfolio")
         self.root.geometry("1000x600")
