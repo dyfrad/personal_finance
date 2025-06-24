@@ -36,6 +36,12 @@ class Database:
         db_name (str): Name of the SQLite database file
     """
     
+    # Category mappings for table selection
+    INVESTMENT_CATEGORIES = ['Stocks', 'Bonds', 'Crypto', 'Real Estate', 'Gold']
+    INVENTORY_CATEGORIES = ['Appliances', 'Electronics', 'Furniture', 'Transportation', 
+                           'Home Improvement', 'Savings', 'Collectibles']
+    EXPENSE_CATEGORIES = ['Expense']
+    
     def __init__(self, db_name="finance.db"):
         """Initialize the database connection.
         
@@ -48,7 +54,7 @@ class Database:
     def init_db(self):
         """Initialize the database with required tables.
         
-        Creates four tables if they don't exist:
+        Creates three category-specific tables:
         1. investments: Stores investment items (stocks, bonds, etc.)
         2. inventory: Stores inventory items (appliances, electronics, etc.)
         3. expenses: Stores expense items
@@ -110,23 +116,7 @@ class Database:
             table_name TEXT NOT NULL DEFAULT 'investments',
             date TEXT NOT NULL,
             amount REAL NOT NULL,
-            price REAL NOT NULL,
-            FOREIGN KEY (item_id) REFERENCES items (id)
-        )
-        ''')
-        
-        # Keep the old items table for now to allow migration
-        cursor.execute('''
-        CREATE TABLE IF NOT EXISTS items (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            name TEXT NOT NULL,
-            purchase_price REAL NOT NULL,
-            date_of_purchase TEXT NOT NULL,
-            current_value REAL NOT NULL,
-            profit_loss REAL NOT NULL,
-            category TEXT NOT NULL,
-            created_at TEXT NOT NULL,
-            updated_at TEXT NOT NULL
+            price REAL NOT NULL
         )
         ''')
         
@@ -142,16 +132,22 @@ class Database:
         Returns:
             str: Table name to use for this category
         """
-        if category in ['Stocks', 'Bonds', 'Crypto', 'Real Estate', 'Gold']:
+        if category in self.INVESTMENT_CATEGORIES:
             return 'investments'
-        elif category in ['Appliances', 'Electronics', 'Furniture', 'Transportation', 
-                         'Home Improvement', 'Savings', 'Collectibles']:
+        elif category in self.INVENTORY_CATEGORIES:
             return 'inventory'
-        elif category == 'Expense':
+        elif category in self.EXPENSE_CATEGORIES:
             return 'expenses'
         else:
-            # Default fallback
-            return 'items'
+            raise ValueError(f"Unknown category: {category}")
+
+    def _get_db_connection(self):
+        """Get a database connection with automatic commit and close.
+        
+        Returns:
+            sqlite3.Connection: Database connection
+        """
+        return sqlite3.connect(self.db_name)
 
     def insert_base_item(self, name, purchase_price, date_of_purchase, current_value, profit_loss, category, created_at, updated_at):
         """Insert a base item into the appropriate table based on category.
@@ -170,7 +166,7 @@ class Database:
             int: ID of the newly inserted item
         """
         table_name = self._get_table_name(category)
-        conn = sqlite3.connect(self.db_name)
+        conn = self._get_db_connection()
         cursor = conn.cursor()
         cursor.execute(f'''
         INSERT INTO {table_name} (name, purchase_price, date_of_purchase, current_value, 
@@ -183,19 +179,6 @@ class Database:
         conn.close()
         return item_id
 
-    def get_last_inserted_item_id(self):
-        """Get the ID of the last inserted item.
-        
-        Returns:
-            int: ID of the most recently inserted item
-        """
-        conn = sqlite3.connect(self.db_name)
-        cursor = conn.cursor()
-        cursor.execute("SELECT last_insert_rowid()")
-        item_id = cursor.fetchone()[0]
-        conn.close()
-        return item_id
-
     def get_item_by_id(self, item_id):
         """Retrieve an item by its ID from any table.
         
@@ -205,11 +188,11 @@ class Database:
         Returns:
             tuple: Row containing item data, or None if not found
         """
-        conn = sqlite3.connect(self.db_name)
+        conn = self._get_db_connection()
         cursor = conn.cursor()
         
-        # Search in all tables
-        tables = ['investments', 'inventory', 'expenses', 'items']
+        # Search in all category-specific tables
+        tables = ['investments', 'inventory', 'expenses']
         for table in tables:
             cursor.execute(f'SELECT * FROM {table} WHERE id = ?', (item_id,))
             row = cursor.fetchone()
@@ -234,7 +217,7 @@ class Database:
             updated_at (str): Update timestamp in ISO format
         """
         table_name = self._get_table_name(category)
-        conn = sqlite3.connect(self.db_name)
+        conn = self._get_db_connection()
         cursor = conn.cursor()
         cursor.execute(f'''
         UPDATE {table_name} 
@@ -252,11 +235,11 @@ class Database:
         Args:
             item_id (int): ID of the item to delete
         """
-        conn = sqlite3.connect(self.db_name)
+        conn = self._get_db_connection()
         cursor = conn.cursor()
         
-        # Delete from all tables (only one will have the item)
-        tables = ['investments', 'inventory', 'expenses', 'items']
+        # Delete from all category-specific tables (only one will have the item)
+        tables = ['investments', 'inventory', 'expenses']
         for table in tables:
             cursor.execute(f'DELETE FROM {table} WHERE id = ?', (item_id,))
         
@@ -272,11 +255,11 @@ class Database:
         This will remove all items and their associated purchases from all tables.
         Use with caution as this operation cannot be undone.
         """
-        conn = sqlite3.connect(self.db_name)
+        conn = self._get_db_connection()
         cursor = conn.cursor()
         
-        # Clear all item tables
-        tables = ['investments', 'inventory', 'expenses', 'items']
+        # Clear all category-specific tables
+        tables = ['investments', 'inventory', 'expenses']
         for table in tables:
             cursor.execute(f'DELETE FROM {table}')
         
@@ -294,7 +277,7 @@ class Database:
             purchase (object): Purchase object with date, amount, and price attributes
             table_name (str): Name of the table the item belongs to ('investments' or 'inventory')
         """
-        conn = sqlite3.connect(self.db_name)
+        conn = self._get_db_connection()
         cursor = conn.cursor()
         cursor.execute('''
         INSERT INTO purchases (item_id, table_name, date, amount, price)
@@ -313,7 +296,7 @@ class Database:
         Returns:
             list: List of tuples containing (date, amount, price) for each purchase
         """
-        conn = sqlite3.connect(self.db_name)
+        conn = self._get_db_connection()
         cursor = conn.cursor()
         cursor.execute('SELECT date, amount, price FROM purchases WHERE item_id = ? AND table_name = ?', (item_id, table_name))
         rows = cursor.fetchall()
@@ -326,7 +309,7 @@ class Database:
         Args:
             mock_items (list): List of Item objects to add to the database
         """
-        conn = sqlite3.connect(self.db_name)
+        conn = self._get_db_connection()
         cursor = conn.cursor()
         now = datetime.now().isoformat()
         for item in mock_items:
@@ -357,23 +340,23 @@ class Database:
         This will remove all purchase records while keeping the items table intact.
         Use with caution as this operation cannot be undone.
         """
-        conn = sqlite3.connect(self.db_name)
+        conn = self._get_db_connection()
         cursor = conn.cursor()
         cursor.execute('DELETE FROM purchases')
         conn.commit()
         conn.close()
 
     def get_all_items(self):
-        """Retrieve all items from all tables.
+        """Retrieve all items from all category-specific tables.
         
         Returns:
             list: List of tuples containing all item data from all tables
         """
-        conn = sqlite3.connect(self.db_name)
+        conn = self._get_db_connection()
         cursor = conn.cursor()
         
         all_items = []
-        tables = ['investments', 'inventory', 'expenses', 'items']
+        tables = ['investments', 'inventory', 'expenses']
         
         for table in tables:
             cursor.execute(f'SELECT * FROM {table}')
@@ -392,7 +375,7 @@ class Database:
         Returns:
             list: List of tuples containing item data for the specified category type
         """
-        conn = sqlite3.connect(self.db_name)
+        conn = self._get_db_connection()
         cursor = conn.cursor()
         
         if category_type == "Investment":
@@ -418,71 +401,9 @@ class Database:
         Returns:
             list: List of tuples containing item data from the specified table
         """
-        conn = sqlite3.connect(self.db_name)
+        conn = self._get_db_connection()
         cursor = conn.cursor()
         cursor.execute(f'SELECT * FROM {table_name}')
         rows = cursor.fetchall()
         conn.close()
-        return rows
-
-    def migrate_items_to_category_tables(self):
-        """Migrate existing items from the items table to category-specific tables.
-        
-        This method moves items from the generic 'items' table to the appropriate
-        category-specific tables (investments, inventory, expenses) based on their category.
-        """
-        conn = sqlite3.connect(self.db_name)
-        cursor = conn.cursor()
-        
-        # Get all items from the old items table
-        cursor.execute('SELECT * FROM items')
-        items = cursor.fetchall()
-        
-        migrated_count = 0
-        for item in items:
-            # item structure: (id, name, purchase_price, date_of_purchase, current_value, profit_loss, category, created_at, updated_at)
-            item_id, name, purchase_price, date_of_purchase, current_value, profit_loss, category, created_at, updated_at = item
-            
-            # Determine target table
-            table_name = self._get_table_name(category)
-            
-            # Skip if it would go back to items table (unknown category)
-            if table_name == 'items':
-                continue
-                
-            # Insert into appropriate table
-            cursor.execute(f'''
-            INSERT INTO {table_name} (name, purchase_price, date_of_purchase, current_value, 
-                             profit_loss, category, created_at, updated_at)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-            ''', (name, purchase_price, date_of_purchase, current_value, profit_loss, category, created_at, updated_at))
-            
-            new_item_id = cursor.lastrowid
-            
-            # For investments, migrate associated purchases
-            if table_name == 'investments':
-                cursor.execute('SELECT * FROM purchases WHERE item_id = ?', (item_id,))
-                purchases = cursor.fetchall()
-                for purchase in purchases:
-                    # purchase structure: (id, item_id, date, amount, price) or (id, item_id, table_name, date, amount, price)
-                    if len(purchase) == 5:
-                        _, _, date, amount, price = purchase
-                    else:
-                        _, _, _, date, amount, price = purchase
-                    cursor.execute('''
-                    INSERT INTO purchases (item_id, table_name, date, amount, price)
-                    VALUES (?, ?, ?, ?, ?)
-                    ''', (new_item_id, 'investments', date, amount, price))
-                
-                # Delete old purchase records
-                cursor.execute('DELETE FROM purchases WHERE item_id = ?', (item_id,))
-            
-            # Delete the item from the old table
-            cursor.execute('DELETE FROM items WHERE id = ?', (item_id,))
-            migrated_count += 1
-        
-        conn.commit()
-        conn.close()
-        
-        print(f"Migration completed: {migrated_count} items moved to category-specific tables.")
-        return migrated_count 
+        return rows 
