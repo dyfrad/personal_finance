@@ -26,7 +26,7 @@ source venv/bin/activate  # Windows: venv\Scripts\activate
 
 # Install and run
 pip install -e .
-personal-finance-manager
+dypf
 
 # Or run from source
 pip install -r requirements.txt
