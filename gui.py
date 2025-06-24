@@ -989,31 +989,18 @@ class MainDashboard:
             self.root.rowconfigure(i, weight=1)
             self.root.columnconfigure(i, weight=1)
         # Top Left: Stock Performance Graph with controls
-        self.frame_topleft = ttk.LabelFrame(self.root, text="Stock Performance", padding=10)
+        self.frame_topleft = ttk.LabelFrame(self.root, text="Placeholder", padding=10)
         self.frame_topleft.grid(row=0, column=0, sticky="nsew", padx=8, pady=8)
-        self.stock_controls_frame = ttk.Frame(self.frame_topleft)
-        self.stock_controls_frame.pack(fill=tk.X, pady=(0, 10))
-        self.show_stock_controls(self.stock_controls_frame)
-        self.stock_graph_frame = ttk.Frame(self.frame_topleft)
-        self.stock_graph_frame.pack(fill=tk.BOTH, expand=True)
-        self.show_stock_performance_graph(self.stock_graph_frame)
         # Top Right: Controls
         self.frame_topright = ttk.LabelFrame(self.root, text="Controls", padding=10)
         self.frame_topright.grid(row=0, column=1, sticky="nsew", padx=8, pady=8)
         self.show_topright_buttons(self.frame_topright)
-        # Bottom Left: Expenses Graph with controls
-        self.frame_bottomleft = ttk.LabelFrame(self.root, text="Expenses (Last Month)", padding=10)
+        # Bottom Left: Placeholder
+        self.frame_bottomleft = ttk.LabelFrame(self.root, text="Placeholder", padding=10)
         self.frame_bottomleft.grid(row=1, column=0, sticky="nsew", padx=8, pady=8)
-        self.expenses_controls_frame = ttk.Frame(self.frame_bottomleft)
-        self.expenses_controls_frame.pack(fill=tk.X, pady=(0, 10))
-        self.show_expenses_controls(self.expenses_controls_frame)
-        self.expenses_graph_frame = ttk.Frame(self.frame_bottomleft)
-        self.expenses_graph_frame.pack(fill=tk.BOTH, expand=True)
-        self.show_expenses_graph(self.expenses_graph_frame)
         # Bottom Right: Placeholder
-        self.frame_bottomright = ttk.LabelFrame(self.root, text="More Features Coming Soon", padding=10)
+        self.frame_bottomright = ttk.LabelFrame(self.root, text="Placeholder", padding=10)
         self.frame_bottomright.grid(row=1, column=1, sticky="nsew", padx=8, pady=8)
-        ttk.Label(self.frame_bottomright, text="(Reserved for future features)").pack(expand=True)
 
     def show_window(self, window_type, window_class, *args, **kwargs):
         """Show a new window of the specified type.
@@ -1062,202 +1049,6 @@ class MainDashboard:
         if window_type in self.open_windows:
             self.open_windows[window_type].destroy()
             del self.open_windows[window_type]
-
-    def show_stock_controls(self, parent):
-        """Create stock control widgets.
-        
-        Args:
-            parent (ttk.Frame): Parent frame for the controls
-        """
-        # Dropdown for stock selection
-        rows = self.db.get_all_items()
-        stock_names = [row[1] for row in rows if row[6] == 'Stocks']
-        self.selected_stock = tk.StringVar(value=stock_names[0] if stock_names else "")
-        ttk.Label(parent, text="Stock:").pack(side=tk.LEFT, padx=5)
-        stock_menu = ttk.OptionMenu(parent, self.selected_stock, self.selected_stock.get(), *stock_names, command=lambda _: self.update_stock_graph())
-        stock_menu.pack(side=tk.LEFT, padx=5)
-        # Time period selector
-        self.stock_period = tk.StringVar(value="1y")
-        ttk.Label(parent, text="Period:").pack(side=tk.LEFT, padx=5)
-        period_menu = ttk.OptionMenu(parent, self.stock_period, "1y", "1mo", "3mo", "6mo", "1y", "2y", "5y", command=lambda _: self.update_stock_graph())
-        period_menu.pack(side=tk.LEFT, padx=5)
-        # Technical indicators
-        self.indicators = {name: tk.BooleanVar(value=(name=="SMA")) for name in ["SMA", "EMA", "RSI", "MACD"]}
-        for name in self.indicators:
-            ttk.Checkbutton(parent, text=name, variable=self.indicators[name], command=self.update_stock_graph).pack(side=tk.LEFT, padx=2)
-
-    def update_stock_graph(self):
-        """Update the stock performance graph."""
-        for widget in self.stock_graph_frame.winfo_children():
-            widget.destroy()
-        self.show_stock_performance_graph(self.stock_graph_frame)
-
-    def show_stock_performance_graph(self, parent):
-        """Show the stock performance graph.
-        
-        Args:
-            parent (ttk.Frame): Parent frame for the graph
-        """
-        rows = self.db.get_all_items()
-        stock_item = next((item for item in self.get_loaded_items() if item.name == self.selected_stock.get()), None)
-        if not stock_item:
-            fig, ax = plt.subplots(figsize=(5, 3))
-            ax.text(0.5, 0.5, "No stock data", ha='center', va='center')
-            canvas = FigureCanvasTkAgg(fig, master=parent)
-            canvas.draw()
-            canvas.get_tk_widget().pack(fill=tk.BOTH, expand=True)
-            return
-
-        period = self.stock_period.get()
-        data = self.get_historical_data_for_stock(stock_item, period)
-        data.index = data.index.tz_localize(None)
-        fig, ax = plt.subplots(figsize=(5, 3))
-        ax.plot(data.index, data['Close'], label=stock_item.name, linewidth=2)
-        # Technical indicators
-        indicators = self.calculate_indicators(data)
-        for name, values in indicators.items():
-            if name == 'MACD':
-                continue  # Only plot MACD on a separate axis if needed
-            ax.plot(data.index, values, label=name, linestyle='--')
-        # Mark purchases
-        if hasattr(stock_item, 'purchases') and stock_item.purchases:
-            for purchase in stock_item.purchases:
-                purchase_date = pd.to_datetime(purchase.date)
-                if purchase_date in data.index:
-                    idx = data.index.get_loc(purchase_date)
-                else:
-                    idx = data.index.get_indexer([purchase_date], method='nearest')[0]
-                price_at_purchase = data['Close'].iloc[idx]
-                point = ax.scatter(data.index[idx], price_at_purchase, color='red', marker='o')
-        ax.set_title(f"Performance: {stock_item.name}")
-        ax.set_ylabel('Value (€)')
-        ax.grid(True)
-        ax.legend()
-        canvas = FigureCanvasTkAgg(fig, master=parent)
-        canvas.draw()
-        canvas.get_tk_widget().pack(fill=tk.BOTH, expand=True)
-        mplcursors.cursor(ax.collections, hover=True)
-
-    def get_loaded_items(self):
-        """Get all items from the database.
-        
-        Returns:
-            list: List of Item objects
-        """
-        from main import load_portfolio
-        return load_portfolio()
-
-    def get_historical_data_for_stock(self, item_data, period):
-        """Get historical data for a stock.
-        
-        Args:
-            item_data (Item): The stock item
-            period (str): Time period for historical data
-            
-        Returns:
-            pd.DataFrame: Historical price data
-        """
-        try:
-            ticker_symbol = item_data.name.split()[0] if ' ' in item_data.name else item_data.name
-            if ticker_symbol == 'VUSA':
-                exchanges = ['', '.L', '.AS', '.DE', '.PA']
-                for suffix in exchanges:
-                    try:
-                        ticker = yf.Ticker(ticker_symbol + suffix)
-                        data = ticker.history(period=period)
-                        if not data.empty:
-                            return data
-                    except:
-                        continue
-                raise ValueError(f"No data found for VUSA on any exchange")
-            else:
-                ticker = yf.Ticker(ticker_symbol)
-                data = ticker.history(period=period)
-            if data.empty:
-                raise ValueError(f"No data found for ticker {ticker_symbol}")
-            return data
-        except Exception as e:
-            print(f"Error fetching data: {e}")
-            messagebox.showerror("Error", f"Could not fetch data for {item_data.name}. Using simulated data instead.")
-            # Fallback to simulated data
-            dates = pd.date_range(end=datetime.now(), periods=365, freq='D')
-            np.random.seed(42)
-            daily_returns = np.random.normal(0.0005, 0.02, len(dates))
-            cumulative_returns = (1 + daily_returns).cumprod()
-            values = item_data.purchase_price * cumulative_returns # This will use the Item's purchase_price for simulation
-            return pd.DataFrame({'Close': values}, index=dates)
-
-    def calculate_indicators(self, data):
-        """Calculate technical indicators for stock data.
-        
-        Args:
-            data (pd.DataFrame): Stock price data
-            
-        Returns:
-            dict: Dictionary of calculated indicators
-        """
-        indicators = {}
-        if self.indicators["SMA"].get():
-            indicators['SMA'] = TechnicalIndicators.sma(data['Close'])
-        if self.indicators["EMA"].get():
-            indicators['EMA'] = TechnicalIndicators.ema(data['Close'])
-        if self.indicators["RSI"].get():
-            indicators['RSI'] = TechnicalIndicators.rsi(data['Close'])
-        if self.indicators["MACD"].get():
-            macd, signal, hist = TechnicalIndicators.macd(data['Close'])
-            indicators['MACD'] = macd
-        return indicators
-
-    def show_expenses_controls(self, parent):
-        """Create expenses control widgets.
-        
-        Args:
-            parent (ttk.Frame): Parent frame for the controls
-        """
-        # Date range selector
-        self.expenses_period = tk.StringVar(value="1mo")
-        ttk.Label(parent, text="Period:").pack(side=tk.LEFT, padx=5)
-        period_menu = ttk.OptionMenu(parent, self.expenses_period, "1mo", "7d", "1mo", "3mo", command=lambda _: self.update_expenses_graph())
-        period_menu.pack(side=tk.LEFT, padx=5)
-        # (Optional) Category filter placeholder
-        # ttk.Label(parent, text="Category:").pack(side=tk.LEFT, padx=5)
-        # ttk.OptionMenu(parent, tk.StringVar(), "All").pack(side=tk.LEFT, padx=5)
-
-    def update_expenses_graph(self):
-        """Update the expenses graph."""
-        for widget in self.expenses_graph_frame.winfo_children():
-            widget.destroy()
-        self.show_expenses_graph(self.expenses_graph_frame)
-
-    def show_expenses_graph(self, parent):
-        """Show the expenses graph.
-        
-        Args:
-            parent (ttk.Frame): Parent frame for the graph
-        """
-        import numpy as np
-        import pandas as pd
-        from datetime import datetime, timedelta
-        today = datetime.now()
-        period = self.expenses_period.get()
-        if period == "7d":
-            days = 7
-        elif period == "3mo":
-            days = 90
-        else:
-            days = 30
-        dates = [today - timedelta(days=i) for i in range(days-1, -1, -1)]
-        expenses = np.random.randint(10, 100, size=days)
-        fig, ax = plt.subplots(figsize=(5, 3))
-        ax.plot(dates, expenses, marker='o', color='purple')
-        ax.set_title(f"Expenses (Last {days} Days)")
-        ax.set_ylabel('Amount (€)')
-        ax.set_xlabel('Date')
-        ax.grid(True)
-        fig.autofmt_xdate()
-        canvas = FigureCanvasTkAgg(fig, master=parent)
-        canvas.draw()
-        canvas.get_tk_widget().pack(fill=tk.BOTH, expand=True)
 
     def show_topright_buttons(self, parent):
         """Create top-right control buttons organized by category.
@@ -1319,20 +1110,10 @@ class MainDashboard:
         self.show_window(window_type, AddItemDialog, self.root, self.db, self.refresh_dashboard, category)
 
     def refresh_dashboard(self):
-        """Refresh all dashboard components."""
-        # Redraw graphs and controls
-        for widget in self.stock_graph_frame.winfo_children():
-            widget.destroy()
-        for widget in self.expenses_graph_frame.winfo_children():
-            widget.destroy()
-        for widget in self.stock_controls_frame.winfo_children():
-            widget.destroy()
+        """Refresh all dashboard components."""        
         for widget in self.expenses_controls_frame.winfo_children():
             widget.destroy()
-        self.show_stock_controls(self.stock_controls_frame)
-        self.show_stock_performance_graph(self.stock_graph_frame)
         self.show_expenses_controls(self.expenses_controls_frame)
-        self.show_expenses_graph(self.expenses_graph_frame)
 
 class PersonalFinanceApp:
     """Main application class for the personal finance manager.
