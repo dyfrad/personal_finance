@@ -22,7 +22,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 import tkinter as tk
 from tkinter import ttk, messagebox
 from main import Item, save_portfolio, load_portfolio
-from database import Database
+from services.database import Database
 import pandas as pd
 from datetime import datetime, timedelta
 import matplotlib

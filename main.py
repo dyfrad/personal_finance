@@ -38,7 +38,7 @@ import pandas as pd
 import numpy as np
 import os 
 from datetime import datetime, timedelta
-from database import Database
+from services.database import Database
 
 class Purchase:
     """Represents a single purchase transaction for stocks or bonds.
@@ -272,7 +272,7 @@ Examples:
     # Start GUI application
     try:
         from gui import MainDashboard
-        from database import Database
+        from services.database import Database
         import tkinter as tk
         
         logger = logging.getLogger(__name__)
