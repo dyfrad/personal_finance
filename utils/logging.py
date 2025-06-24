@@ -1,3 +1,5 @@
+"""Logging configuration and utilities."""
+
 import logging
 import logging.handlers
 import os

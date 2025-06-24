@@ -1,3 +1,5 @@
+"""Critical application functionality tests."""
+
 import pytest
 import sqlite3
 import tempfile

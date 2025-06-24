@@ -1,9 +1,4 @@
-"""
-Version information for Personal Finance Manager.
-
-This module centralizes version information to avoid duplication
-across setup.py, main.py, and other files.
-"""
+"""Application version and metadata configuration."""
 
 __version__ = "0.2.3"
 __app_name__ = "Personal Finance Manager"

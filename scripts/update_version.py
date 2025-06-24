@@ -1,10 +1,4 @@
-#!/usr/bin/env python3
-"""
-Version update utility for Personal Finance Manager.
-
-This script helps update the version number in the centralized location.
-Usage: python scripts/update_version.py <new_version>
-"""
+"""Version management and update utility."""
 
 import sys
 import re

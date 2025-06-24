@@ -1,3 +1,5 @@
+"""Unit tests for database operations."""
+
 import pytest
 import sqlite3
 from datetime import datetime

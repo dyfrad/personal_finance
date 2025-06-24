@@ -1,3 +1,5 @@
+"""Unit tests for data models."""
+
 import pytest
 from datetime import datetime
 from models.item import Item

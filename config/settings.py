@@ -1,3 +1,5 @@
+"""Application configuration management."""
+
 import os
 from typing import Dict, Any
 from dataclasses import dataclass, field
