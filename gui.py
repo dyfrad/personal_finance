@@ -521,9 +521,8 @@ class MainDashboard:
     Attributes:
         root (tk.Tk): The root window
         db (Database): Database connection for data operations
-        windows (dict): Dictionary of active window instances
-        stock_frame (ttk.Frame): Frame containing stock-related controls
-        expenses_frame (ttk.Frame): Frame containing expenses-related controls
+        open_windows (dict): Dictionary of active window instances
+        controls_frame (ttk.LabelFrame): Frame containing centered control buttons
     """
     def __init__(self, root, db):
         set_theme(root)
@@ -538,22 +537,14 @@ class MainDashboard:
 
     def create_layout(self):
         """Create the main dashboard layout."""
-        for i in range(2):
-            self.root.rowconfigure(i, weight=1)
-            self.root.columnconfigure(i, weight=1)
-        # Top Left: Stock Performance Graph with controls
-        self.frame_topleft = ttk.LabelFrame(self.root, text="Placeholder", padding=10)
-        self.frame_topleft.grid(row=0, column=0, sticky="nsew", padx=8, pady=8)
-        # Top Right: Controls
-        self.frame_topright = ttk.LabelFrame(self.root, text="Controls", padding=10)
-        self.frame_topright.grid(row=0, column=1, sticky="nsew", padx=8, pady=8)
-        self.show_topright_buttons(self.frame_topright)
-        # Bottom Left: Placeholder
-        self.frame_bottomleft = ttk.LabelFrame(self.root, text="Placeholder", padding=10)
-        self.frame_bottomleft.grid(row=1, column=0, sticky="nsew", padx=8, pady=8)
-        # Bottom Right: Placeholder
-        self.frame_bottomright = ttk.LabelFrame(self.root, text="Placeholder", padding=10)
-        self.frame_bottomright.grid(row=1, column=1, sticky="nsew", padx=8, pady=8)
+        # Configure single row and column to center the controls
+        self.root.rowconfigure(0, weight=1)
+        self.root.columnconfigure(0, weight=1)
+        
+        # Create centered controls frame
+        self.controls_frame = ttk.LabelFrame(self.root, text="Controls", padding=20)
+        self.controls_frame.grid(row=0, column=0, padx=50, pady=50)
+        self.show_topright_buttons(self.controls_frame)
 
     def show_window(self, window_type, window_class, *args, **kwargs):
         """Show a new window of the specified type.
@@ -664,9 +655,8 @@ class MainDashboard:
 
     def refresh_dashboard(self):
         """Refresh all dashboard components."""        
-        for widget in self.expenses_controls_frame.winfo_children():
-            widget.destroy()
-        self.show_expenses_controls(self.expenses_controls_frame)
+        # With the simplified centered layout, there's nothing dynamic to refresh
+        pass
 
 class PersonalFinanceApp:
     """Main application class for the personal finance manager.
@@ -677,7 +667,7 @@ class PersonalFinanceApp:
     Attributes:
         root (tk.Tk): The root window
         db (Database): Database connection for data operations
-        windows (dict): Dictionary of active window instances
+        open_windows (dict): Dictionary of active window instances
         portfolio_tree (ttk.Treeview): Treeview widget displaying portfolio items
         right_panel (ttk.Frame): Frame containing right panel controls
     """
