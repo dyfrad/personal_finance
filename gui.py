@@ -757,8 +757,8 @@ class PersonalFinanceApp:
         # Add buttons
         button_frame = ttk.Frame(right_frame)
         button_frame.grid(row=1, column=0, columnspan=2, pady=10)
-        ttk.Button(button_frame, text="Export Portfolio", command=self.export_portfolio_gui).pack(side=tk.LEFT, padx=5)
-        ttk.Button(button_frame, text="Load Portfolio", command=self.load_portfolio_gui).pack(side=tk.LEFT, padx=5)
+        ttk.Button(button_frame, text="Export", command=self.export_portfolio_gui).pack(side=tk.LEFT, padx=5)
+        ttk.Button(button_frame, text="Load", command=self.load_portfolio_gui).pack(side=tk.LEFT, padx=5)
         ttk.Button(button_frame, text="Edit Selected", command=self.edit_selected).pack(side=tk.LEFT, padx=5)
         ttk.Button(button_frame, text="Delete Selected", command=self.delete_selected).pack(side=tk.LEFT, padx=5)
         ttk.Button(button_frame, text="View/Add Purchases", command=self.view_purchases).pack(side=tk.LEFT, padx=5)
